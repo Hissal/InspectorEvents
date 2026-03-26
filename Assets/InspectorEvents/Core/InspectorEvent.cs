@@ -1,4 +1,5 @@
 ﻿using System;
+using InspectorEvents.Internal;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -51,6 +52,43 @@ public sealed class InspectorEvent<TEvent> {
     [PropertySpace]
     [SerializeReference] 
     IInspectorEventHandler<TEvent>[] handlers = Array.Empty<IInspectorEventHandler<TEvent>>();
+
+#if UNITY_EDITOR
+    [SerializeReference, HideInInspector]
+    IValueConstructor? valueConstructor;
+
+    IValueConstructor EnsureValueConstructor() {
+        if (valueConstructor == null || valueConstructor.ValueType != typeof(TEvent)) {
+            valueConstructor = IValueConstructor.Create(typeof(TEvent));
+        }
+
+        return valueConstructor;
+    }
+
+    public object GetOrCreateValueConstructorObject() {
+        return EnsureValueConstructor();
+    }
+
+    public bool TryInvokeConfigured(out string error) {
+        var constructor = EnsureValueConstructor();
+        var boxed = constructor.ConstructValueBoxed();
+
+        if (boxed is TEvent typedValue) {
+            Invoke(typedValue);
+            error = string.Empty;
+            return true;
+        }
+
+        if (boxed == null && !typeof(TEvent).IsValueType) {
+            Invoke(default!);
+            error = string.Empty;
+            return true;
+        }
+
+        error = constructor.LastError ?? $"Configured value type mismatch. Expected '{typeof(TEvent).FullName}', got '{boxed.GetType().FullName}'.";
+        return false;
+    }
+#endif
 
     public void Invoke(in TEvent e) {
         if (!EvaluateFilters(e)) 
