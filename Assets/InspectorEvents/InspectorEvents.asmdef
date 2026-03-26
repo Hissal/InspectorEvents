@@ -1,0 +1,16 @@
+{
+    "name": "InspectorEvents",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f9785da0d0caa3949acdb2a713fcf8a7"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
