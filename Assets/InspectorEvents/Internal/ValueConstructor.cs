@@ -28,6 +28,7 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
 
     [SerializeField, BoxGroup("Constructor"), HideLabel, HideIf(nameof(UseDirectValue))]
     [ValueDropdown(nameof(GetConstructorOptions))]
+    [OnValueChanged(nameof(OnSelectedConstructorChanged))]
     int selectedConstructorIndex;
 
     [SerializeField, ListDrawerSettings(
@@ -58,6 +59,7 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
         Rebuild();
     }
 
+    [OnInspectorInit]
     public void Rebuild() {
         valueTypeName = typeof(T).AssemblyQualifiedName ?? typeof(T).FullName ?? typeof(T).Name;
 
@@ -77,12 +79,58 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
             return;
         }
 
-        if (selectedConstructorIndex < 0 || selectedConstructorIndex >= constructorPlans.Count) {
-            selectedConstructorIndex = 0;
-        }
-
+        selectedConstructorIndex = ResolveConstructorIndex(constructorPlans);
         EnsureConstructorSlots(constructorPlans[selectedConstructorIndex]);
         EnsureMemberSlots();
+    }
+
+    void OnSelectedConstructorChanged() {
+        if (UseDirectValue) {
+            return;
+        }
+
+        var constructorPlans = TypePlanCache.ConstructorPlans;
+        if (constructorPlans.Count == 0) {
+            selectedConstructorIndex = -1;
+            constructorArguments.Clear();
+            EnsureMemberSlots();
+            return;
+        }
+
+        selectedConstructorIndex = Mathf.Clamp(selectedConstructorIndex, 0, constructorPlans.Count - 1);
+        EnsureConstructorSlots(constructorPlans[selectedConstructorIndex]);
+        EnsureMemberSlots();
+    }
+
+    int ResolveConstructorIndex(IReadOnlyList<ConstructorPlan> plans) {
+        if (selectedConstructorIndex >= 0
+            && selectedConstructorIndex < plans.Count
+            && SignatureMatches(plans[selectedConstructorIndex]))
+        {
+            return selectedConstructorIndex;
+        }
+
+        for (var i = 0; i < plans.Count; i++) {
+            if (SignatureMatches(plans[i])) {
+                return i;
+            }
+        }
+
+        return 0;
+    }
+
+    bool SignatureMatches(ConstructorPlan plan) {
+        if (constructorArguments.Count != plan.Parameters.Length) {
+            return false;
+        }
+
+        for (var i = 0; i < plan.Parameters.Length; i++) {
+            if (!constructorArguments[i].MatchesParameterType(plan.Parameters[i].ParameterType)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public T ConstructValue() {
@@ -172,18 +220,46 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
     }
 
     void EnsureConstructorSlots(ConstructorPlan plan) {
-        var previous = constructorArguments.ToDictionary(x => x.ParameterName, x => x);
+        var previous = constructorArguments.ToList();
+        var consumed = new bool[previous.Count];
         constructorArguments.Clear();
 
         foreach (var parameter in plan.Parameters) {
-            if (previous.TryGetValue(parameter.Name, out var existing)) {
+            var matchedIndex = FindBestArgumentMatch(previous, consumed, parameter);
+            if (matchedIndex >= 0) {
+                var existing = previous[matchedIndex];
                 existing.Reinitialize(parameter.Name, parameter.ParameterType);
                 constructorArguments.Add(existing);
+                consumed[matchedIndex] = true;
             }
             else {
                 constructorArguments.Add(new ParameterValue(parameter.Name, parameter.ParameterType));
             }
         }
+    }
+
+    static int FindBestArgumentMatch(IReadOnlyList<ParameterValue> previous, IReadOnlyList<bool> consumed, ParameterInfo parameter) {
+        for (var i = 0; i < previous.Count; i++) {
+            if (consumed[i]) {
+                continue;
+            }
+
+            if (previous[i].Matches(parameter.Name, parameter.ParameterType)) {
+                return i;
+            }
+        }
+
+        for (var i = 0; i < previous.Count; i++) {
+            if (consumed[i]) {
+                continue;
+            }
+
+            if (previous[i].MatchesParameterType(parameter.ParameterType)) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     void EnsureMemberSlots() {
@@ -270,18 +346,30 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
     [Serializable]
     sealed class ParameterValue {
         [SerializeField, HideInInspector] string parameterName;
+        [SerializeField, HideInInspector] string parameterTypeName = string.Empty;
         [SerializeField, InlineProperty, HideLabel] SupportedValue value = new();
 
         public string ParameterName => parameterName;
 
         public ParameterValue(string parameterName, Type parameterType) {
             this.parameterName = parameterName;
+            parameterTypeName = parameterType.AssemblyQualifiedName ?? parameterType.FullName ?? parameterType.Name;
             value.InitializeFor(parameterType, BuildLabel(parameterName, parameterType));
         }
 
         public void Reinitialize(string name, Type parameterType) {
             parameterName = name;
+            parameterTypeName = parameterType.AssemblyQualifiedName ?? parameterType.FullName ?? parameterType.Name;
             value.InitializeFor(parameterType, BuildLabel(name, parameterType));
+        }
+
+        public bool Matches(string name, Type type) {
+            return string.Equals(parameterName, name, StringComparison.Ordinal) && MatchesParameterType(type);
+        }
+
+        public bool MatchesParameterType(Type type) {
+            var declared = Type.GetType(parameterTypeName, throwOnError: false);
+            return declared == type;
         }
 
         public bool TryResolve(Type targetType, out object? result, out string? error) {
