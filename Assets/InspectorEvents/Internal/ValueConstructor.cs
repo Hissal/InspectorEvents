@@ -62,7 +62,7 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
         valueTypeName = typeof(T).AssemblyQualifiedName ?? typeof(T).FullName ?? typeof(T).Name;
 
         if (UseDirectValue) {
-            directValue.InitializeFor(typeof(T));
+            directValue.InitializeFor(typeof(T), $"{typeof(T).Name}");
             selectedConstructorIndex = -1;
             constructorArguments.Clear();
             memberAssignments.Clear();
@@ -94,7 +94,7 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
         lastError = null;
 
         if (UseDirectValue) {
-            directValue.InitializeFor(typeof(T));
+            directValue.InitializeFor(typeof(T), $"{typeof(T).Name}");
             if (!directValue.TryResolve(typeof(T), typeof(T).Name, out var directResult, out var error)) {
                 lastError = error;
                 return null;
@@ -270,21 +270,18 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
     [Serializable]
     sealed class ParameterValue {
         [SerializeField, HideInInspector] string parameterName;
-        [SerializeField, DisplayAsString(false), HideLabel] string parameterLabel = string.Empty;
         [SerializeField, InlineProperty, HideLabel] SupportedValue value = new();
 
         public string ParameterName => parameterName;
 
         public ParameterValue(string parameterName, Type parameterType) {
             this.parameterName = parameterName;
-            parameterLabel = BuildLabel(parameterName, parameterType);
-            value.InitializeFor(parameterType);
+            value.InitializeFor(parameterType, BuildLabel(parameterName, parameterType));
         }
 
         public void Reinitialize(string name, Type parameterType) {
             parameterName = name;
-            parameterLabel = BuildLabel(name, parameterType);
-            value.InitializeFor(parameterType);
+            value.InitializeFor(parameterType, BuildLabel(name, parameterType));
         }
 
         public bool TryResolve(Type targetType, out object? result, out string? error) {
@@ -299,10 +296,9 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
 
     [Serializable]
     sealed class MemberValue {
-        [SerializeField, HorizontalGroup("Label", Width = 20f), HideLabel] bool enabled;
+        [SerializeField, HorizontalGroup("Row", Width = 20f), HideLabel] bool enabled;
         [SerializeField, HideInInspector] string memberName;
-        [SerializeField, DisplayAsString(false), HorizontalGroup("Label"), HideLabel, EnableIf(nameof(enabled))] string memberLabel = string.Empty;
-        [SerializeField, InlineProperty, HideLabel, EnableIf(nameof(enabled))] SupportedValue value = new();
+        [SerializeField, InlineProperty, HideLabel, HorizontalGroup("Row"), EnableIf(nameof(enabled))] SupportedValue value = new();
 
         public bool Enabled => enabled;
         public string MemberName => memberName;
@@ -310,14 +306,12 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
         public MemberValue(string memberName, Type memberType) {
             enabled = false;
             this.memberName = memberName;
-            memberLabel = BuildLabel(memberName, memberType);
-            value.InitializeFor(memberType);
+            value.InitializeFor(memberType, BuildLabel(memberName, memberType));
         }
 
         public void Reinitialize(string name, Type memberType) {
             memberName = name;
-            memberLabel = BuildLabel(name, memberType);
-            value.InitializeFor(memberType);
+            value.InitializeFor(memberType, BuildLabel(name, memberType));
         }
 
         public bool TryResolve(Type targetType, out object? result, out string? error) {
@@ -396,25 +390,66 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
         }
 
         [SerializeField, HideInInspector] string targetTypeName = string.Empty;
+        [SerializeField, HideInInspector] string slotLabel = string.Empty;
+        [SerializeField, HideInInspector] bool useNestedClassConstructor;
 
-        [SerializeField, ShowIf(nameof(IsBool)), HideLabel] bool boolValue;
-        [SerializeField, ShowIf(nameof(IsInt)), HideLabel] int intValue;
-        [SerializeField, ShowIf(nameof(IsFloat)), HideLabel] float floatValue;
-        [SerializeField, ShowIf(nameof(IsString)), HideLabel] string stringValue = string.Empty;
-        [SerializeField, ShowIf(nameof(IsLong)), HideLabel] long longValue;
-        [SerializeField, ShowIf(nameof(IsDouble)), HideLabel] double doubleValue;
-        [SerializeField, ShowIf(nameof(IsUnityObject)), HideLabel] UnityEngine.Object? objectReference;
-        [SerializeField, ShowIf(nameof(IsVector2)), HideLabel] Vector2 vector2Value;
-        [SerializeField, ShowIf(nameof(IsVector3)), HideLabel] Vector3 vector3Value;
-        [SerializeField, ShowIf(nameof(IsVector4)), HideLabel] Vector4 vector4Value;
-        [SerializeField, ShowIf(nameof(IsColor)), HideLabel] Color colorValue = Color.white;
-        [SerializeField, ShowIf(nameof(IsEnum)), HideLabel]
-        [ValueDropdown(nameof(GetEnumOptions))]
-        string enumName = string.Empty;
-        [SerializeReference, ShowIf(nameof(IsSerializedClass)), HideLabel]
+        [SerializeField, ShowIf(nameof(IsBool)), HideLabel, LabelText("@slotLabel")] bool boolValue;
+        [SerializeField, ShowIf(nameof(IsInt)), HideLabel, LabelText("@slotLabel")] int intValue;
+        [SerializeField, ShowIf(nameof(IsFloat)), HideLabel, LabelText("@slotLabel")] float floatValue;
+        [SerializeField, ShowIf(nameof(IsString)), HideLabel, LabelText("@slotLabel")] string stringValue = string.Empty;
+        [SerializeField, ShowIf(nameof(IsLong)), HideLabel, LabelText("@slotLabel")] long longValue;
+        [SerializeField, ShowIf(nameof(IsDouble)), HideLabel, LabelText("@slotLabel")] double doubleValue;
+        [SerializeField, ShowIf(nameof(IsUnityObject)), HideLabel, LabelText("@slotLabel")] UnityEngine.Object? objectReference;
+        [SerializeField, ShowIf(nameof(IsVector2)), HideLabel, LabelText("@slotLabel")] Vector2 vector2Value;
+        [SerializeField, ShowIf(nameof(IsVector3)), HideLabel, LabelText("@slotLabel")] Vector3 vector3Value;
+        [SerializeField, ShowIf(nameof(IsVector4)), HideLabel, LabelText("@slotLabel")] Vector4 vector4Value;
+        [SerializeField, ShowIf(nameof(IsColor)), HideLabel, LabelText("@slotLabel")] Color colorValue = Color.white;
+        [SerializeField, ShowIf(nameof(IsEnum)), HideLabel, LabelText("@slotLabel")] 
+        [ValueDropdown(nameof(GetEnumOptions))] string enumName = string.Empty;
+
+        [SerializeReference, ShowIf(nameof(IsSerializedClass)), HideReferenceObjectPicker, LabelText("@slotLabel"), HorizontalGroup("ComplexRow")]
         object? serializableObject;
-        [SerializeReference, ShowIf(nameof(UseNestedConstructor)), HideLabel]
+
+        [SerializeReference, ShowIf(nameof(UseNestedConstructor)), HideReferenceObjectPicker, LabelText("@slotLabel"), HorizontalGroup("ComplexRow")]
         IValueConstructor? nestedValueConstructor;
+
+        [ShowIf(nameof(CanToggleClassMode)), HorizontalGroup("ComplexRow", Width = 92f)]
+        [Button("@ModeToggleText", ButtonSizes.Small)]
+        void DrawClassModeToggleButton() {
+            ToggleClassModeFromSlot();
+        }
+
+        public bool CanToggleClassMode {
+            get {
+                var type = Nullable.GetUnderlyingType(TargetType ?? typeof(void)) ?? TargetType;
+                return type != null && IsSerializableClassType(type);
+            }
+        }
+
+        public string ModeToggleText => useNestedClassConstructor ? "Use Object" : "Use Ctor";
+
+        public void ToggleClassModeFromSlot() {
+            useNestedClassConstructor = !useNestedClassConstructor;
+
+            var type = Nullable.GetUnderlyingType(TargetType ?? typeof(void)) ?? TargetType;
+            if (type == null || !IsSerializableClassType(type)) {
+                return;
+            }
+
+            if (useNestedClassConstructor) {
+                if (nestedValueConstructor == null || nestedValueConstructor.ValueType != type) {
+                    nestedValueConstructor = IValueConstructor.Create(type);
+                }
+            }
+            else {
+                if (serializableObject == null || !type.IsInstanceOfType(serializableObject)) {
+                    serializableObject = TryCreateClassInstance(type);
+                }
+            }
+        }
+
+        string GetClassModeToggleText() => useNestedClassConstructor ? "Use Object" : "Use Ctor";
+
 
         Type? TargetType {
             get {
@@ -443,7 +478,7 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
                 if (type == typeof(Vector4)) return SupportedKind.Vector4;
                 if (type == typeof(Color)) return SupportedKind.Color;
                 if (IsStructType(type)) return SupportedKind.NestedStruct;
-                if (IsSerializableClassType(type)) return SupportedKind.SerializedClass;
+                if (IsSerializableClassType(type)) return useNestedClassConstructor ? SupportedKind.NestedClass : SupportedKind.SerializedClass;
                 if (IsClassType(type)) return SupportedKind.NestedClass;
                 return SupportedKind.Unsupported;
             }
@@ -462,7 +497,9 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
         bool IsColor => Kind == SupportedKind.Color;
         bool IsEnum => Kind == SupportedKind.Enum;
         bool IsSerializedClass => Kind == SupportedKind.SerializedClass;
-        bool UseNestedConstructor => Kind == SupportedKind.NestedStruct || Kind == SupportedKind.NestedClass;
+        bool IsNestedStruct => Kind == SupportedKind.NestedStruct;
+        bool IsNestedClass => Kind == SupportedKind.NestedClass;
+        bool UseNestedConstructor => IsNestedStruct || IsNestedClass;
 
         IEnumerable<ValueDropdownItem<string>> GetEnumOptions() {
             var enumType = Nullable.GetUnderlyingType(TargetType ?? typeof(void)) ?? TargetType;
@@ -513,7 +550,8 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
             return type.IsValueType && !type.IsPrimitive && !type.IsEnum;
         }
 
-        public void InitializeFor(Type type) {
+        public void InitializeFor(Type type, string label) {
+            slotLabel = label;
             targetTypeName = type.AssemblyQualifiedName ?? type.FullName ?? type.Name;
             var resolvedType = Nullable.GetUnderlyingType(type) ?? type;
 
@@ -521,28 +559,31 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
                 enumName = Enum.GetNames(resolvedType).FirstOrDefault() ?? string.Empty;
             }
 
-            var shouldUseNestedConstructor = IsStructType(resolvedType) || (IsClassType(resolvedType) && !IsSerializableClassType(resolvedType));
+            if (IsClassType(resolvedType) && !IsSerializableClassType(resolvedType)) {
+                useNestedClassConstructor = true;
+            }
+
+            var shouldUseNestedConstructor = IsStructType(resolvedType)
+                                             || (IsClassType(resolvedType) && (!IsSerializableClassType(resolvedType) || useNestedClassConstructor));
             if (shouldUseNestedConstructor) {
                 if (nestedValueConstructor == null || nestedValueConstructor.ValueType != resolvedType) {
                     nestedValueConstructor = IValueConstructor.Create(resolvedType);
                 }
             }
-            else {
-                nestedValueConstructor = null;
-            }
 
             if (IsSerializableClassType(resolvedType)) {
                 if (serializableObject == null || !resolvedType.IsInstanceOfType(serializableObject)) {
-                    try {
-                        serializableObject = Activator.CreateInstance(resolvedType, nonPublic: true);
-                    }
-                    catch {
-                        serializableObject = null;
-                    }
+                    serializableObject = TryCreateClassInstance(resolvedType);
                 }
             }
-            else {
-                serializableObject = null;
+        }
+
+        static object? TryCreateClassInstance(Type type) {
+            try {
+                return Activator.CreateInstance(type, nonPublic: true);
+            }
+            catch {
+                return null;
             }
         }
 
@@ -634,7 +675,7 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
                     return true;
                 }
 
-                if (IsSerializableClassType(t)) {
+                if (IsSerializableClassType(t) && !useNestedClassConstructor) {
                     if (serializableObject != null && !t.IsInstanceOfType(serializableObject)) {
                         value = null;
                         error = $"Slot '{slotName}' expects '{t.Name}', got '{serializableObject.GetType().Name}'.";
@@ -646,7 +687,7 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
                     return true;
                 }
 
-                if (IsStructType(t) || (IsClassType(t) && !IsSerializableClassType(t))) {
+                if (IsStructType(t) || (IsClassType(t) && (!IsSerializableClassType(t) || useNestedClassConstructor))) {
                     if (nestedValueConstructor == null || nestedValueConstructor.ValueType != t) {
                         nestedValueConstructor = IValueConstructor.Create(t);
                     }
