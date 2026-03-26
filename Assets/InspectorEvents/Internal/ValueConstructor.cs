@@ -23,7 +23,10 @@ internal interface IValueConstructor {
 internal sealed class ValueConstructor<T> : IValueConstructor {
     [SerializeField, HideInInspector] string valueTypeName = typeof(T).AssemblyQualifiedName ?? typeof(T).FullName ?? typeof(T).Name;
 
-    [SerializeField, BoxGroup("Constructor"), HideLabel]
+    [SerializeField, BoxGroup("Value"), ShowIf(nameof(UseDirectValue)), HideLabel]
+    SupportedValue directValue = new();
+
+    [SerializeField, BoxGroup("Constructor"), HideLabel, HideIf(nameof(UseDirectValue))]
     [ValueDropdown(nameof(GetConstructorOptions))]
     int selectedConstructorIndex;
 
@@ -32,7 +35,7 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
         DraggableItems = false,
         HideAddButton = true,
         HideRemoveButton = true
-    )]
+    ), HideIf(nameof(UseDirectValue))]
     List<ParameterValue> constructorArguments = new();
 
     [SerializeField, ListDrawerSettings(
@@ -40,7 +43,7 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
          DraggableItems = false,
          HideAddButton = true,
          HideRemoveButton = true
-     )]
+     ), HideIf(nameof(UseDirectValue))]
     List<MemberValue> memberAssignments = new();
 
     [SerializeField, TextArea, ReadOnly]
@@ -49,12 +52,22 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
     public Type ValueType => typeof(T);
     public string? LastError => string.IsNullOrWhiteSpace(lastError) ? null : lastError;
 
+    bool UseDirectValue => SupportedValue.IsSupported(typeof(T));
+
     internal ValueConstructor() {
         Rebuild();
     }
 
     public void Rebuild() {
         valueTypeName = typeof(T).AssemblyQualifiedName ?? typeof(T).FullName ?? typeof(T).Name;
+
+        if (UseDirectValue) {
+            directValue.InitializeFor(typeof(T));
+            selectedConstructorIndex = -1;
+            constructorArguments.Clear();
+            memberAssignments.Clear();
+            return;
+        }
 
         var constructorPlans = TypePlanCache.ConstructorPlans;
         if (constructorPlans.Count == 0) {
@@ -79,6 +92,16 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
 
     public object? ConstructValueBoxed() {
         lastError = null;
+
+        if (UseDirectValue) {
+            directValue.InitializeFor(typeof(T));
+            if (!directValue.TryResolve(typeof(T), typeof(T).Name, out var directResult, out var error)) {
+                lastError = error;
+                return null;
+            }
+
+            return directResult;
+        }
 
         var constructors = TypePlanCache.ConstructorPlans;
         var members = TypePlanCache.MemberPlans;
