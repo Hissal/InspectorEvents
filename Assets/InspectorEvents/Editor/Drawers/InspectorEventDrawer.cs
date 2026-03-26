@@ -103,11 +103,23 @@ namespace InspectorEvents.Editor.Drawers {
     }
 
     sealed class ValueConstructorPopupContent : PopupWindowContent {
+        const float c_maxWidth = 480f;
+        const float c_maxHeight = 560f;
+        const float c_minWidth = 320f;
+        const float c_minHeight = 180f;
+        const float c_contentPadding = 24f;
+        const float c_resizeApplyThreshold = 6f;
+        const float c_heightJitterTolerance = 2f;
+        const int c_shrinkStableRepaints = 6;
+
         readonly object _target;
         readonly string _title;
 
         PropertyTree _tree;
         Vector2 _scroll;
+        Vector2 _windowSize = new(c_maxWidth, c_maxHeight);
+        float _lastMeasuredHeight = c_maxHeight;
+        int _stableShrinkRepaintCount;
 
         ValueConstructorPopupContent(object target, string title) {
             _target = target;
@@ -119,11 +131,14 @@ namespace InspectorEvents.Editor.Drawers {
         }
 
         public override Vector2 GetWindowSize() {
-            return new Vector2(480f, 560f);
+            return _windowSize;
         }
 
         public override void OnOpen() {
             DisposeTree();
+            _windowSize = new Vector2(c_maxWidth, c_maxHeight);
+            _lastMeasuredHeight = c_maxHeight;
+            _stableShrinkRepaintCount = 0;
             _tree = PropertyTree.Create(_target);
             editorWindow.titleContent = new GUIContent(_title);
         }
@@ -138,8 +153,70 @@ namespace InspectorEvents.Editor.Drawers {
             }
 
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
+            EditorGUILayout.BeginVertical();
             _tree.Draw(false);
+            EditorGUILayout.EndVertical();
+            var contentRect = GUILayoutUtility.GetLastRect();
             EditorGUILayout.EndScrollView();
+
+            if (Event.current.type != EventType.Repaint) {
+                return;
+            }
+
+            // Measure drawn content height rather than the scroll viewport size.
+            var targetHeight = Mathf.Clamp(contentRect.height + c_contentPadding, c_minHeight, c_maxHeight);
+            UpdateWindowSizeForContent(targetHeight);
+        }
+
+        void UpdateWindowSizeForContent(float targetHeight) {
+            if (editorWindow == null) {
+                return;
+            }
+
+            // Expand quickly so newly revealed content is never clipped.
+            if (targetHeight > _windowSize.y + c_resizeApplyThreshold) {
+                _stableShrinkRepaintCount = 0;
+                _lastMeasuredHeight = targetHeight;
+                ApplyWindowSize(targetHeight);
+                return;
+            }
+
+            // Shrink only after a stable sequence to avoid oscillating resize flicker.
+            if (targetHeight < _windowSize.y - c_resizeApplyThreshold) {
+                if (Mathf.Abs(targetHeight - _lastMeasuredHeight) <= c_heightJitterTolerance) {
+                    _stableShrinkRepaintCount++;
+                }
+                else {
+                    _stableShrinkRepaintCount = 0;
+                }
+
+                _lastMeasuredHeight = targetHeight;
+
+                if (_stableShrinkRepaintCount >= c_shrinkStableRepaints) {
+                    _stableShrinkRepaintCount = 0;
+                    ApplyWindowSize(targetHeight);
+                }
+
+                return;
+            }
+
+            _stableShrinkRepaintCount = 0;
+            _lastMeasuredHeight = targetHeight;
+        }
+
+        void ApplyWindowSize(float targetHeight) {
+            if (editorWindow == null) {
+                return;
+            }
+
+            var clampedWidth = Mathf.Clamp(c_maxWidth, c_minWidth, c_maxWidth);
+            if (Mathf.Abs(_windowSize.y - targetHeight) < 2f && Mathf.Abs(_windowSize.x - clampedWidth) < 0.5f) {
+                return;
+            }
+
+            _windowSize = new Vector2(clampedWidth, targetHeight);
+            var position = editorWindow.position;
+            editorWindow.position = new Rect(position.x, position.y, _windowSize.x, _windowSize.y);
         }
 
         void DisposeTree() {
