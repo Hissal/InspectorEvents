@@ -98,67 +98,6 @@ namespace InspectorEvents.Core {
             return (Action<TEvent>)_eventCall;
         }
 
-#if UNITY_EDITOR
-        /// <summary>
-        /// Invoked when the test button dispatches a constructed event payload.
-        /// </summary>
-        protected virtual void OnInvokeTestEvent<TEvent>(in TEvent message) where TEvent : TEventBase {
-            // Default: run through the sentinel pipeline used by runtime subscriptions.
-            GetOrCreateEventCall<TEvent>().Invoke(message);
-        }
-
-        void InvokeTestTyped<TEvent>(object value) where TEvent : TEventBase {
-            OnInvokeTestEvent((TEvent)value);
-        }
-
-        [FoldoutGroup("Controls/Test Invoke", Expanded = false)]
-        [Button("Invoke")]
-        [ShowIf("@eventType.IsValid")]
-        public void InvokeTestEvent() {
-            var type = eventType.Type;
-            if (type == null) {
-                Debug.LogWarning("Cannot invoke test event: no event type selected.", this);
-                return;
-            }
-
-            if (testValueConstructor == null) {
-                Debug.LogWarning("Cannot invoke test event: missing value constructor. Change event type to regenerate it.", this);
-                return;
-            }
-
-            if (testValueConstructor.ValueType != type) {
-                testValueConstructor = IValueConstructor.Create(type);
-            }
-
-            var value = testValueConstructor.ConstructValueBoxed();
-            if (value == null) {
-                Debug.LogWarning($"Cannot invoke test event for '{type.Name}': {testValueConstructor.LastError ?? "no value produced"}.", this);
-                return;
-            }
-
-            if (_testEventInvoker == null || _testEventInvokerType != type) {
-                _testEventInvoker = TestEventInvokerCache.Get(type);
-                _testEventInvokerType = type;
-            }
-
-            try {
-                _testEventInvoker(this, value);
-            }
-            catch (Exception e) {
-                Debug.LogError($"Unhandled exception while invoking test event '{type.FullName}'. {e}", this);
-            }
-        }
-    
-        [SerializeReference]
-        [FoldoutGroup("Controls/Test Invoke/Value", 1)]
-        [HideReferenceObjectPicker, InlineProperty, HideLabel]
-        [ShowIf("@eventType.IsValid")]
-        IValueConstructor? testValueConstructor;
-    
-        Action<EventListenerBehaviorBase<TEventBase>, object>? _testEventInvoker;
-        Type? _testEventInvokerType;
-#endif
-
         protected override void HandleLifecycleMessage(LifecycleMessage message) {
             switch (_isSubscribed) {
                 case false when message == subscribeOn:
@@ -184,37 +123,25 @@ namespace InspectorEvents.Core {
             _eventCall = null;
             _eventCallType = null;
             _eventCallSentinel = null;
-            _testEventInvoker = null;
-            _testEventInvokerType = null;
 
             var type = eventType.Type;
             if (type == null) {
                 handlerSentinel = null;
-                testValueConstructor = null;
                 return;
             }
 
             if (!typeof(TEventBase).IsAssignableFrom(type)) {
                 Debug.LogError($"Selected event type '{type.FullName}' is not assignable to '{typeof(TEventBase).FullName}'.");
                 handlerSentinel = null;
-                testValueConstructor = null;
                 return;
             }
 
             try {
                 handlerSentinel = IEventHandlerSentinel.Create(type);
-                try {
-                    testValueConstructor = IValueConstructor.Create(type);
-                }
-                catch (Exception e) {
-                    Debug.LogWarning($"Failed to create value constructor for event type '{type.FullName}'. Test event invocation will not work. {e}");
-                    testValueConstructor = null;
-                }
             }
             catch (Exception ex) {
                 Debug.LogError($"Failed to create event handler sentinel for event type '{type.FullName}'. {ex}");
                 handlerSentinel = null;
-                testValueConstructor = null;
             }
         }
 #endif
@@ -244,31 +171,5 @@ namespace InspectorEvents.Core {
                 }
             }
         }
-
-#if UNITY_EDITOR
-        static class TestEventInvokerCache {
-            static readonly object syncRoot = new();
-            static readonly Dictionary<Type, Action<EventListenerBehaviorBase<TEventBase>, object>> cache = new();
-            static readonly MethodInfo invokeTypedMethod = typeof(EventListenerBehaviorBase<TEventBase>)
-                .GetMethod(nameof(InvokeTestTyped), BindingFlags.Instance | BindingFlags.NonPublic)!;
-
-            public static Action<EventListenerBehaviorBase<TEventBase>, object> Get(Type eventType) {
-                lock (syncRoot) {
-                    if (cache.TryGetValue(eventType, out var invoker)) {
-                        return invoker;
-                    }
-
-                    var typedMethod = invokeTypedMethod.MakeGenericMethod(eventType);
-                    invoker = (Action<EventListenerBehaviorBase<TEventBase>, object>)Delegate.CreateDelegate(
-                        typeof(Action<EventListenerBehaviorBase<TEventBase>, object>),
-                        null,
-                        typedMethod
-                    );
-                    cache.Add(eventType, invoker);
-                    return invoker;
-                }
-            }
-        }
-#endif
     }
 }
