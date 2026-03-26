@@ -90,7 +90,7 @@ namespace InspectorEvents.Core {
                 || !ReferenceEquals(_eventCallSentinel, handlerSentinel)
                 || _eventCall is not Action<TEvent>)
             {
-                _eventCall = DynamicEventInvoker.CreateCaller<TEvent>(handlerSentinel);
+                _eventCall = handlerSentinel?.CreateCaller<TEvent>() ?? (static _ => { });
                 _eventCallType = typeof(TEvent);
                 _eventCallSentinel = handlerSentinel;
             }
