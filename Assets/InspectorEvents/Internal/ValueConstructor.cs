@@ -390,8 +390,9 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
             Vector4,
             Color,
             Enum,
-            SerializableClass,
-            SerializableStruct
+            SerializedClass,
+            NestedStruct,
+            NestedClass
         }
 
         [SerializeField, HideInInspector] string targetTypeName = string.Empty;
@@ -410,9 +411,9 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
         [SerializeField, ShowIf(nameof(IsEnum)), HideLabel]
         [ValueDropdown(nameof(GetEnumOptions))]
         string enumName = string.Empty;
-        [SerializeReference, ShowIf(nameof(IsSerializableClass)), HideLabel]
+        [SerializeReference, ShowIf(nameof(IsSerializedClass)), HideLabel]
         object? serializableObject;
-        [SerializeReference, ShowIf(nameof(IsSerializableStruct)), HideLabel]
+        [SerializeReference, ShowIf(nameof(UseNestedConstructor)), HideLabel]
         IValueConstructor? nestedValueConstructor;
 
         Type? TargetType {
@@ -441,8 +442,9 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
                 if (type == typeof(Vector3)) return SupportedKind.Vector3;
                 if (type == typeof(Vector4)) return SupportedKind.Vector4;
                 if (type == typeof(Color)) return SupportedKind.Color;
-                if (IsSerializableStructType(type)) return SupportedKind.SerializableStruct;
-                if (IsSerializableClassType(type)) return SupportedKind.SerializableClass;
+                if (IsStructType(type)) return SupportedKind.NestedStruct;
+                if (IsSerializableClassType(type)) return SupportedKind.SerializedClass;
+                if (IsClassType(type)) return SupportedKind.NestedClass;
                 return SupportedKind.Unsupported;
             }
         }
@@ -459,8 +461,8 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
         bool IsVector4 => Kind == SupportedKind.Vector4;
         bool IsColor => Kind == SupportedKind.Color;
         bool IsEnum => Kind == SupportedKind.Enum;
-        bool IsSerializableClass => Kind == SupportedKind.SerializableClass;
-        bool IsSerializableStruct => Kind == SupportedKind.SerializableStruct;
+        bool IsSerializedClass => Kind == SupportedKind.SerializedClass;
+        bool UseNestedConstructor => Kind == SupportedKind.NestedStruct || Kind == SupportedKind.NestedClass;
 
         IEnumerable<ValueDropdownItem<string>> GetEnumOptions() {
             var enumType = Nullable.GetUnderlyingType(TargetType ?? typeof(void)) ?? TargetType;
@@ -492,23 +494,23 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
 
         public static bool IsSupported(Type type) {
             var t = Nullable.GetUnderlyingType(type) ?? type;
-            return IsSimpleSupported(t) || IsSerializableClassType(t) || IsSerializableStructType(t);
+            if (t == typeof(void) || t.IsPointer || t.IsByRef || t.ContainsGenericParameters) {
+                return false;
+            }
+
+            return IsSimpleSupported(t) || IsStructType(t) || IsClassType(t);
+        }
+
+        static bool IsClassType(Type type) {
+            return type.IsClass && type != typeof(string);
         }
 
         static bool IsSerializableClassType(Type type) {
-            return type.IsClass
-                   && type != typeof(string)
-                   && !type.IsAbstract
-                   && !type.IsInterface
-                   && type.IsSerializable;
+            return IsClassType(type) && type.IsSerializable;
         }
 
-        static bool IsSerializableStructType(Type type) {
-            return type.IsValueType
-                   && !type.IsPrimitive
-                   && !type.IsEnum
-                   && type != typeof(decimal)
-                   && type.IsSerializable;
+        static bool IsStructType(Type type) {
+            return type.IsValueType && !type.IsPrimitive && !type.IsEnum;
         }
 
         public void InitializeFor(Type type) {
@@ -519,7 +521,8 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
                 enumName = Enum.GetNames(resolvedType).FirstOrDefault() ?? string.Empty;
             }
 
-            if (IsSerializableStructType(resolvedType)) {
+            var shouldUseNestedConstructor = IsStructType(resolvedType) || (IsClassType(resolvedType) && !IsSerializableClassType(resolvedType));
+            if (shouldUseNestedConstructor) {
                 if (nestedValueConstructor == null || nestedValueConstructor.ValueType != resolvedType) {
                     nestedValueConstructor = IValueConstructor.Create(resolvedType);
                 }
@@ -643,14 +646,25 @@ internal sealed class ValueConstructor<T> : IValueConstructor {
                     return true;
                 }
 
-                if (IsSerializableStructType(t)) {
+                if (IsStructType(t) || (IsClassType(t) && !IsSerializableClassType(t))) {
                     if (nestedValueConstructor == null || nestedValueConstructor.ValueType != t) {
                         nestedValueConstructor = IValueConstructor.Create(t);
                     }
 
                     value = nestedValueConstructor.ConstructValueBoxed();
                     if (value == null) {
+                        if (!t.IsValueType) {
+                            error = null;
+                            return true;
+                        }
+
                         error = nestedValueConstructor.LastError ?? $"Slot '{slotName}' could not construct '{t.Name}'.";
+                        return false;
+                    }
+
+                    if (!t.IsInstanceOfType(value) && !(t.IsValueType && value.GetType() == t)) {
+                        error = $"Slot '{slotName}' expected '{t.Name}', got '{value.GetType().Name}'.";
+                        value = null;
                         return false;
                     }
 
