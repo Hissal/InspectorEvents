@@ -3,7 +3,7 @@ using InspectorEvents.Core;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace InspectorEvents.Listeners;
+namespace InspectorEvents.Handlers;
 
 internal enum DebugAction {
     Log,

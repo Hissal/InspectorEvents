@@ -2,7 +2,7 @@
 using InspectorEvents.Core;
 using UnityEngine;
 
-namespace InspectorEvents.Listeners;
+namespace InspectorEvents.Handlers;
 
 [Serializable]
 public sealed class IEH_ToNonGenericAdapter<TEvent> : IInspectorEventHandler<TEvent> {

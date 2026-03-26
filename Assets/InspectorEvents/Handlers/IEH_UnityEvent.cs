@@ -3,7 +3,7 @@ using InspectorEvents.Core;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace InspectorEvents.Listeners;
+namespace InspectorEvents.Handlers;
 
 [Serializable]
 public sealed class IEH_UnityEvent<TMessage> : IInspectorEventHandler<TMessage> {
