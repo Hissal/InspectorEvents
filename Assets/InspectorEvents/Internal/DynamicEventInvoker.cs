@@ -1,6 +1,7 @@
 ﻿using System;
+using InspectorEvents.Core;
 
-namespace InspectorEvents;
+namespace InspectorEvents.Internal;
 
 internal static class DynamicEventInvoker {
     public static Action<TEvent> CreateCaller<TEvent>(ISerializedEventListener? listener, ISerializedEventFilter? filter) {

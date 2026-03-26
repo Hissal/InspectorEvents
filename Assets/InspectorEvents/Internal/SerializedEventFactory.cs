@@ -1,8 +1,9 @@
 ﻿using System;
+using InspectorEvents.Core;
 using InspectorEvents.Listeners;
 using UnityEngine;
 
-namespace InspectorEvents;
+namespace InspectorEvents.Internal;
 
 internal static class SerializedEventFactory {
     public static ISerializedEventListener CreateDefaultListenerPackage(Type eventType) {

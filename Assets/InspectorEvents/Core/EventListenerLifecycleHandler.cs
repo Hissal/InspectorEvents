@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace InspectorEvents {
+namespace InspectorEvents.Core {
     public enum LifecycleMessage {
         None,
 

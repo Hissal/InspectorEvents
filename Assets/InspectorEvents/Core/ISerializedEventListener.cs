@@ -1,4 +1,4 @@
-﻿namespace InspectorEvents;
+﻿namespace InspectorEvents.Core;
 
 public interface ISerializedEventListener { }
 

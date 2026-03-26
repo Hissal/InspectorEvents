@@ -1,4 +1,5 @@
 ﻿using System;
+using InspectorEvents.Core;
 using UnityEngine;
 
 namespace InspectorEvents.Listeners;
