@@ -1,23 +1,12 @@
 ﻿using System;
-using InspectorEvents.Core;
 
 namespace InspectorEvents.Internal;
 
 internal static class DynamicEventInvoker {
-    public static Action<TEvent> CreateCaller<TEvent>(ISerializedEventListener? listener, ISerializedEventFilter? filter) {
-        var typedFilter = filter as ISerializedEventFilter<TEvent>;
-         
-        return listener is not ISerializedEventListener<TEvent> typedListener 
-            ? EmptyActionCache<TEvent>.Value 
-            : e => InvokeListener(typedListener, typedFilter, e);
-    }
-
-    static void InvokeListener<TEvent>(ISerializedEventListener<TEvent> listener, ISerializedEventFilter<TEvent>? filter, in TEvent e) {
-        if (filter != null && !filter.Filter(e)) {
-            return;
-        }
-
-        listener.OnEvent(e);
+    public static Action<TEvent> CreateCaller<TEvent>(IEventHandlerSentinel? sentinel) {
+        return sentinel is not EventHandlerSentinel<TEvent> typedSentinel
+            ? EmptyActionCache<TEvent>.Value
+            : e => typedSentinel.Handle(e);
     }
 
     static class EmptyActionCache<TEvent> {

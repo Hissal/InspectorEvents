@@ -25,24 +25,14 @@ namespace InspectorEvents.Core {
         [SerializeReference]
         [HideReferenceObjectPicker, InlineProperty, HideLabel]
         [ShowIf("@eventType.IsValid")]
-        ISerializedEventFilter? filter;
-
-        [SerializeReference]
-        [HideReferenceObjectPicker, InlineProperty, HideLabel]
-        [ShowIf("@eventType.IsValid")]
-        ISerializedEventListener? listener;
-
-#if UNITY_EDITOR
-
-#endif
-
+        IEventHandlerSentinel? handlerSentinel;
+        
         Action<EventListenerBehaviorBase<TEventBase>>? _subscriber;
         Type? _subscriberType;
 
         Delegate? _eventCall;
         Type? _eventCallType;
-        ISerializedEventListener? _eventCallListener;
-        ISerializedEventFilter? _eventCallFilter;
+        IEventHandlerSentinel? _eventCallSentinel;
 
         bool _isSubscribed;
 
@@ -57,7 +47,7 @@ namespace InspectorEvents.Core {
         [EnableIf(nameof(EnableSubscribeButton))]
 #endif
         public void Subscribe() {
-            if (listener == null) {
+            if (handlerSentinel == null) {
                 return;
             }
 
@@ -97,14 +87,12 @@ namespace InspectorEvents.Core {
 
         Action<TEvent> GetOrCreateEventCall<TEvent>() where TEvent : TEventBase {
             if (_eventCallType != typeof(TEvent)
-                || !ReferenceEquals(_eventCallListener, listener)
-                || !ReferenceEquals(_eventCallFilter, filter)
+                || !ReferenceEquals(_eventCallSentinel, handlerSentinel)
                 || _eventCall is not Action<TEvent>)
             {
-                _eventCall = DynamicEventInvoker.CreateCaller<TEvent>(listener, filter);
+                _eventCall = DynamicEventInvoker.CreateCaller<TEvent>(handlerSentinel);
                 _eventCallType = typeof(TEvent);
-                _eventCallListener = listener;
-                _eventCallFilter = filter;
+                _eventCallSentinel = handlerSentinel;
             }
 
             return (Action<TEvent>)_eventCall;
@@ -112,10 +100,10 @@ namespace InspectorEvents.Core {
 
 #if UNITY_EDITOR
         /// <summary>
-        /// Invoked when the 
+        /// Invoked when the test button dispatches a constructed event payload.
         /// </summary>
         protected virtual void OnInvokeTestEvent<TEvent>(in TEvent message) where TEvent : TEventBase {
-            // Default: run through local listener/filter for editor validation.
+            // Default: run through the sentinel pipeline used by runtime subscriptions.
             GetOrCreateEventCall<TEvent>().Invoke(message);
         }
 
@@ -195,31 +183,26 @@ namespace InspectorEvents.Core {
             _subscriberType = null;
             _eventCall = null;
             _eventCallType = null;
-            _eventCallListener = null;
-            _eventCallFilter = null;
+            _eventCallSentinel = null;
             _testEventInvoker = null;
             _testEventInvokerType = null;
 
             var type = eventType.Type;
             if (type == null) {
-                listener = null;
-                filter = null;
+                handlerSentinel = null;
                 testValueConstructor = null;
                 return;
             }
 
             if (!typeof(TEventBase).IsAssignableFrom(type)) {
                 Debug.LogError($"Selected event type '{type.FullName}' is not assignable to '{typeof(TEventBase).FullName}'.");
-                listener = null;
-                filter = null;
+                handlerSentinel = null;
                 testValueConstructor = null;
                 return;
             }
 
             try {
-                listener = SerializedEventFactory.CreateDefaultListenerPackage(type);
-                filter = SerializedEventFactory.CreateDefaultFilterPackage(type);
-            
+                handlerSentinel = IEventHandlerSentinel.Create(type);
                 try {
                     testValueConstructor = IValueConstructor.Create(type);
                 }
@@ -229,9 +212,8 @@ namespace InspectorEvents.Core {
                 }
             }
             catch (Exception ex) {
-                Debug.LogError($"Failed to create default listener/filter for event type '{type.FullName}'. {ex}");
-                listener = null;
-                filter = null;
+                Debug.LogError($"Failed to create event handler sentinel for event type '{type.FullName}'. {ex}");
+                handlerSentinel = null;
                 testValueConstructor = null;
             }
         }
