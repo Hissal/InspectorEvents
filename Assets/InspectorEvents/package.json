@@ -1,0 +1,14 @@
+﻿{
+  "name": "com.hissal.inspectorevents",
+  "version": "0.1.0",
+  "displayName": "Inspector Events",
+  "description": "Enhanced serialization options for events in the Unity Inspector.",
+  "unity": "6000.0",
+  "author": {
+    "name": "Hissal"
+  },
+  "dependencies": {
+    "com.hissal.unity-type-serializer": "https://github.com/Hissal/UnityTypeSerializer.git"
+  }
+}
+
