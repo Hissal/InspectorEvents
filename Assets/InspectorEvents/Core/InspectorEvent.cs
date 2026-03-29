@@ -6,16 +6,6 @@ using UnityEngine;
 namespace InspectorEvents.Core;
 
 [Serializable]
-public sealed class TestFileter : IInspectorEventFilter {
-    public bool Evaluate() => Application.isPlaying;
-}
-
-[Serializable]
-public sealed class TestHandler : IInspectorEventHandler {
-    public void Handle() => Debug.Log("Handled!");
-}
-
-[Serializable]
 public sealed class InspectorEvent {
     [SerializeReference] 
     IInspectorEventFilter[] filters = Array.Empty<IInspectorEventFilter>();
