@@ -1,0 +1,16 @@
+{
+  "name": "InspectorEvents.Editor.Tests",
+  "references": [
+    "InspectorEvents"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ]
+}

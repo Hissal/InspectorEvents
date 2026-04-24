@@ -248,12 +248,42 @@ MonoBehaviour:
   typedInspectorEvent:
     filters: []
     handlers:
-    - rid: 7975205934022000868
+    - rid: 6554014554647953591
     valueConstructor:
       rid: 7975205934022000869
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6554014554647953591
+      type: {class: IEH_NumericTransformCall, ns: InspectorEvents.Handlers, asm: InspectorEvents}
+      data:
+        mode: 3
+        intSetValue: 0
+        intAddValue: 0
+        intMultiplyFactor: 1
+        intClampMin: 0
+        intClampMax: 0
+        intHandlers: []
+        longSetValue: 0
+        longAddValue: 0
+        longMultiplyFactor: 1
+        longClampMin: 0
+        longClampMax: 0
+        longHandlers: []
+        floatSetValue: 0
+        floatAddValue: 0
+        floatMultiplyFactor: 1
+        floatClampMin: 0
+        floatClampMax: 0
+        floatHandlers: []
+        doubleSetValue: 0
+        doubleAddValue: 0
+        doubleMultiplyFactor: 1
+        doubleClampMin: 0
+        doubleClampMax: 0
+        doubleHandlers: []
     - rid: 7975205934022000865
       type: {class: IEH_Debug, ns: InspectorEvents.Listeners, asm: InspectorEvents}
       data:
@@ -261,18 +291,32 @@ MonoBehaviour:
         logLevel: 0
         prefix: '[SerializedEventLogger] : '
         message: Log message
-    - rid: 7975205934022000868
-      type: {class: 'IEH_Debug`1[[System.Int32, mscorlib]]', ns: InspectorEvents.Listeners, asm: InspectorEvents}
-      data:
-        action: 0
-        logLevel: 0
-        prefix: '[SerializedEventLogger<<type>>] : '
-        message: <value>
     - rid: 7975205934022000869
       type: {class: 'ValueConstructor`1[[System.Int32, mscorlib]]', ns: InspectorEvents.Internal, asm: InspectorEvents}
       data:
         valueTypeName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
+        directValue:
+          targetTypeName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+          slotLabel: Int32
+          useNestedClassConstructor: 0
+          boolValue: 0
+          intValue: 0
+          floatValue: 0
+          stringValue: 
+          longValue: 0
+          doubleValue: 0
+          objectReference: {fileID: 0}
+          vector2Value: {x: 0, y: 0}
+          vector3Value: {x: 0, y: 0, z: 0}
+          vector4Value: {x: 0, y: 0, z: 0, w: 0}
+          colorValue: {r: 1, g: 1, b: 1, a: 1}
+          enumName: 
+          serializableObject:
+            rid: -2
+          nestedValueConstructor:
+            rid: -2
         selectedConstructorIndex: -1
         constructorArguments: []
         memberAssignments: []
@@ -296,11 +340,11 @@ MonoBehaviour:
       PublicKeyToken=null
   handlerSentinel:
     rid: 7975205934022000871
-  testValueConstructor:
-    rid: 7975205934022000872
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 7975205934022000871
       type: {class: 'EventHandlerSentinel`1[[InspectorEvents.TestEvent2, Assembly-CSharp]]', ns: InspectorEvents.Internal, asm: InspectorEvents}
       data:
@@ -309,79 +353,41 @@ MonoBehaviour:
           handlers: []
           valueConstructor:
             rid: 7975205934022000873
-    - rid: 7975205934022000872
-      type: {class: 'ValueConstructor`1[[InspectorEvents.TestEvent2, Assembly-CSharp]]', ns: InspectorEvents.Internal, asm: InspectorEvents}
-      data:
-        valueTypeName: InspectorEvents.TestEvent2, Assembly-CSharp, Version=0.0.0.0,
-          Culture=neutral, PublicKeyToken=null
-        selectedConstructorIndex: 0
-        constructorArguments:
-        - parameterName: value
-          parameterLabel: value (Int32)
-          value:
-            targetTypeName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
-              PublicKeyToken=b77a5c561934e089
-            boolValue: 0
-            intValue: 0
-            floatValue: 0
-            stringValue: 
-            longValue: 0
-            doubleValue: 0
-            objectReference: {fileID: 0}
-            vector2Value: {x: 0, y: 0}
-            vector3Value: {x: 0, y: 0, z: 0}
-            vector4Value: {x: 0, y: 0, z: 0, w: 0}
-            colorValue: {r: 1, g: 1, b: 1, a: 1}
-            enumName: 
-        - parameterName: otherValue
-          parameterLabel: otherValue (Single)
-          value:
-            targetTypeName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
-              PublicKeyToken=b77a5c561934e089
-            boolValue: 0
-            intValue: 0
-            floatValue: 0
-            stringValue: 
-            longValue: 0
-            doubleValue: 0
-            objectReference: {fileID: 0}
-            vector2Value: {x: 0, y: 0}
-            vector3Value: {x: 0, y: 0, z: 0}
-            vector4Value: {x: 0, y: 0, z: 0, w: 0}
-            colorValue: {r: 1, g: 1, b: 1, a: 1}
-            enumName: 
-        memberAssignments:
-        - enabled: 0
-          memberName: myVector
-          memberLabel: myVector (Vector3)
-          value:
-            targetTypeName: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
-              Culture=neutral, PublicKeyToken=null
-            boolValue: 0
-            intValue: 0
-            floatValue: 0
-            stringValue: 
-            longValue: 0
-            doubleValue: 0
-            objectReference: {fileID: 0}
-            vector2Value: {x: 0, y: 0}
-            vector3Value: {x: 0, y: 0, z: 0}
-            vector4Value: {x: 0, y: 0, z: 0, w: 0}
-            colorValue: {r: 1, g: 1, b: 1, a: 1}
-            enumName: 
-        lastError: 
     - rid: 7975205934022000873
       type: {class: 'ValueConstructor`1[[InspectorEvents.TestEvent2, Assembly-CSharp]]', ns: InspectorEvents.Internal, asm: InspectorEvents}
       data:
         valueTypeName: InspectorEvents.TestEvent2, Assembly-CSharp, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
+        directValue:
+          targetTypeName: 
+          slotLabel: 
+          useNestedClassConstructor: 0
+          boolValue: 0
+          intValue: 0
+          floatValue: 0
+          stringValue: 
+          longValue: 0
+          doubleValue: 0
+          objectReference: {fileID: 0}
+          vector2Value: {x: 0, y: 0}
+          vector3Value: {x: 0, y: 0, z: 0}
+          vector4Value: {x: 0, y: 0, z: 0, w: 0}
+          colorValue: {r: 1, g: 1, b: 1, a: 1}
+          enumName: 
+          serializableObject:
+            rid: -2
+          nestedValueConstructor:
+            rid: -2
         selectedConstructorIndex: 0
         constructorArguments:
         - parameterName: value
-          parameterLabel: value (Int32)
+          parameterTypeName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
           value:
             targetTypeName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
               PublicKeyToken=b77a5c561934e089
+            slotLabel: value (Int32)
+            useNestedClassConstructor: 0
             boolValue: 0
             intValue: 0
             floatValue: 0
@@ -394,11 +400,18 @@ MonoBehaviour:
             vector4Value: {x: 0, y: 0, z: 0, w: 0}
             colorValue: {r: 1, g: 1, b: 1, a: 1}
             enumName: 
+            serializableObject:
+              rid: -2
+            nestedValueConstructor:
+              rid: -2
         - parameterName: otherValue
-          parameterLabel: otherValue (Single)
+          parameterTypeName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
           value:
             targetTypeName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
               PublicKeyToken=b77a5c561934e089
+            slotLabel: otherValue (Single)
+            useNestedClassConstructor: 0
             boolValue: 0
             intValue: 0
             floatValue: 0
@@ -411,13 +424,18 @@ MonoBehaviour:
             vector4Value: {x: 0, y: 0, z: 0, w: 0}
             colorValue: {r: 1, g: 1, b: 1, a: 1}
             enumName: 
+            serializableObject:
+              rid: -2
+            nestedValueConstructor:
+              rid: -2
         memberAssignments:
         - enabled: 0
           memberName: myVector
-          memberLabel: myVector (Vector3)
           value:
             targetTypeName: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
               Culture=neutral, PublicKeyToken=null
+            slotLabel: 
+            useNestedClassConstructor: 0
             boolValue: 0
             intValue: 0
             floatValue: 0
@@ -430,6 +448,10 @@ MonoBehaviour:
             vector4Value: {x: 0, y: 0, z: 0, w: 0}
             colorValue: {r: 1, g: 1, b: 1, a: 1}
             enumName: 
+            serializableObject:
+              rid: -2
+            nestedValueConstructor:
+              rid: -2
         lastError: 
 --- !u!4 &399593426
 Transform:

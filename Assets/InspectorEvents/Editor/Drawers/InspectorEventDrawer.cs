@@ -1,4 +1,4 @@
-﻿using InspectorEvents.Core;
+using InspectorEvents.Core;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
 using UnityEditor;
