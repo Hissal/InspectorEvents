@@ -7,6 +7,36 @@ using UnityEngine;
 
 namespace InspectorEvents.Internal;
 
+static class ValueConstructorFactory {
+    [ThreadStatic]
+    static Stack<Type>? currentCreateStack;
+
+    public static IValueConstructor Create(Type type) {
+        currentCreateStack ??= new Stack<Type>();
+        if (currentCreateStack.Contains(type)) {
+            var path = string.Join(" -> ", currentCreateStack.Reverse().Append(type).Select(FormatTypeName));
+            var message = $"Recursive constructor graph detected: {path}. Nested recursive value construction is not supported.";
+            return new RecursiveValueConstructor(type, message);
+        }
+
+        currentCreateStack.Push(type);
+        try {
+            var constructorType = typeof(ValueConstructor<>).MakeGenericType(type);
+            return (IValueConstructor)Activator.CreateInstance(constructorType, nonPublic: true)!;
+        }
+        finally {
+            currentCreateStack.Pop();
+            if (currentCreateStack.Count == 0) {
+                currentCreateStack = null;
+            }
+        }
+    }
+
+    static string FormatTypeName(Type type) {
+        return type.FullName ?? type.Name;
+    }
+}
+
 internal interface IValueConstructor {
     Type ValueType { get; }
     object? ConstructValueBoxed();
@@ -14,8 +44,28 @@ internal interface IValueConstructor {
     string? LastError { get; }
     
     public static IValueConstructor Create(Type type) {
-        var constructorType = typeof(ValueConstructor<>).MakeGenericType(type);
-        return (IValueConstructor)Activator.CreateInstance(constructorType, nonPublic: true)!;
+        return ValueConstructorFactory.Create(type);
+    }
+}
+
+[Serializable]
+internal sealed class RecursiveValueConstructor : IValueConstructor {
+    [SerializeField, HideInInspector] string valueTypeName = string.Empty;
+    [SerializeField, TextArea, ReadOnly] string lastError = string.Empty;
+
+    public Type ValueType => Type.GetType(valueTypeName, throwOnError: false) ?? typeof(object);
+    public string? LastError => string.IsNullOrWhiteSpace(lastError) ? null : lastError;
+
+    public RecursiveValueConstructor(Type valueType, string error) {
+        valueTypeName = valueType.AssemblyQualifiedName ?? valueType.FullName ?? valueType.Name;
+        lastError = error;
+    }
+
+    public object? ConstructValueBoxed() {
+        return null;
+    }
+
+    public void Rebuild() {
     }
 }
 
