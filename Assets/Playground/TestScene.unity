@@ -211,6 +211,241 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &399593423
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 399593426}
+  - component: {fileID: 399593425}
+  - component: {fileID: 399593424}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &399593424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 399593423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f227d3a94f9e4094ab7614880b42cfd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InspectorEvents.INspectorEventSerialization
+  inspectorEvent:
+    filters: []
+    handlers:
+    - rid: 7975205934022000865
+  typedInspectorEvent:
+    filters: []
+    handlers:
+    - rid: 7975205934022000868
+    valueConstructor:
+      rid: 7975205934022000869
+  references:
+    version: 2
+    RefIds:
+    - rid: 7975205934022000865
+      type: {class: IEH_Debug, ns: InspectorEvents.Listeners, asm: InspectorEvents}
+      data:
+        action: 0
+        logLevel: 0
+        prefix: '[SerializedEventLogger] : '
+        message: Log message
+    - rid: 7975205934022000868
+      type: {class: 'IEH_Debug`1[[System.Int32, mscorlib]]', ns: InspectorEvents.Listeners, asm: InspectorEvents}
+      data:
+        action: 0
+        logLevel: 0
+        prefix: '[SerializedEventLogger<<type>>] : '
+        message: <value>
+    - rid: 7975205934022000869
+      type: {class: 'ValueConstructor`1[[System.Int32, mscorlib]]', ns: InspectorEvents.Internal, asm: InspectorEvents}
+      data:
+        valueTypeName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+        selectedConstructorIndex: -1
+        constructorArguments: []
+        memberAssignments: []
+        lastError: 
+--- !u!114 &399593425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 399593423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ec9dc20b5e5f5842a3b197510a00bb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InspectorEvents.EventListenerBehavior
+  subscribeOn: 3
+  unsubscribeOn: 4
+  eventType:
+    aqn: InspectorEvents.TestEvent2, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  handlerSentinel:
+    rid: 7975205934022000871
+  testValueConstructor:
+    rid: 7975205934022000872
+  references:
+    version: 2
+    RefIds:
+    - rid: 7975205934022000871
+      type: {class: 'EventHandlerSentinel`1[[InspectorEvents.TestEvent2, Assembly-CSharp]]', ns: InspectorEvents.Internal, asm: InspectorEvents}
+      data:
+        event:
+          filters: []
+          handlers: []
+          valueConstructor:
+            rid: 7975205934022000873
+    - rid: 7975205934022000872
+      type: {class: 'ValueConstructor`1[[InspectorEvents.TestEvent2, Assembly-CSharp]]', ns: InspectorEvents.Internal, asm: InspectorEvents}
+      data:
+        valueTypeName: InspectorEvents.TestEvent2, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        selectedConstructorIndex: 0
+        constructorArguments:
+        - parameterName: value
+          parameterLabel: value (Int32)
+          value:
+            targetTypeName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
+              PublicKeyToken=b77a5c561934e089
+            boolValue: 0
+            intValue: 0
+            floatValue: 0
+            stringValue: 
+            longValue: 0
+            doubleValue: 0
+            objectReference: {fileID: 0}
+            vector2Value: {x: 0, y: 0}
+            vector3Value: {x: 0, y: 0, z: 0}
+            vector4Value: {x: 0, y: 0, z: 0, w: 0}
+            colorValue: {r: 1, g: 1, b: 1, a: 1}
+            enumName: 
+        - parameterName: otherValue
+          parameterLabel: otherValue (Single)
+          value:
+            targetTypeName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+              PublicKeyToken=b77a5c561934e089
+            boolValue: 0
+            intValue: 0
+            floatValue: 0
+            stringValue: 
+            longValue: 0
+            doubleValue: 0
+            objectReference: {fileID: 0}
+            vector2Value: {x: 0, y: 0}
+            vector3Value: {x: 0, y: 0, z: 0}
+            vector4Value: {x: 0, y: 0, z: 0, w: 0}
+            colorValue: {r: 1, g: 1, b: 1, a: 1}
+            enumName: 
+        memberAssignments:
+        - enabled: 0
+          memberName: myVector
+          memberLabel: myVector (Vector3)
+          value:
+            targetTypeName: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
+              Culture=neutral, PublicKeyToken=null
+            boolValue: 0
+            intValue: 0
+            floatValue: 0
+            stringValue: 
+            longValue: 0
+            doubleValue: 0
+            objectReference: {fileID: 0}
+            vector2Value: {x: 0, y: 0}
+            vector3Value: {x: 0, y: 0, z: 0}
+            vector4Value: {x: 0, y: 0, z: 0, w: 0}
+            colorValue: {r: 1, g: 1, b: 1, a: 1}
+            enumName: 
+        lastError: 
+    - rid: 7975205934022000873
+      type: {class: 'ValueConstructor`1[[InspectorEvents.TestEvent2, Assembly-CSharp]]', ns: InspectorEvents.Internal, asm: InspectorEvents}
+      data:
+        valueTypeName: InspectorEvents.TestEvent2, Assembly-CSharp, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        selectedConstructorIndex: 0
+        constructorArguments:
+        - parameterName: value
+          parameterLabel: value (Int32)
+          value:
+            targetTypeName: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
+              PublicKeyToken=b77a5c561934e089
+            boolValue: 0
+            intValue: 0
+            floatValue: 0
+            stringValue: 
+            longValue: 0
+            doubleValue: 0
+            objectReference: {fileID: 0}
+            vector2Value: {x: 0, y: 0}
+            vector3Value: {x: 0, y: 0, z: 0}
+            vector4Value: {x: 0, y: 0, z: 0, w: 0}
+            colorValue: {r: 1, g: 1, b: 1, a: 1}
+            enumName: 
+        - parameterName: otherValue
+          parameterLabel: otherValue (Single)
+          value:
+            targetTypeName: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+              PublicKeyToken=b77a5c561934e089
+            boolValue: 0
+            intValue: 0
+            floatValue: 0
+            stringValue: 
+            longValue: 0
+            doubleValue: 0
+            objectReference: {fileID: 0}
+            vector2Value: {x: 0, y: 0}
+            vector3Value: {x: 0, y: 0, z: 0}
+            vector4Value: {x: 0, y: 0, z: 0, w: 0}
+            colorValue: {r: 1, g: 1, b: 1, a: 1}
+            enumName: 
+        memberAssignments:
+        - enabled: 0
+          memberName: myVector
+          memberLabel: myVector (Vector3)
+          value:
+            targetTypeName: UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0,
+              Culture=neutral, PublicKeyToken=null
+            boolValue: 0
+            intValue: 0
+            floatValue: 0
+            stringValue: 
+            longValue: 0
+            doubleValue: 0
+            objectReference: {fileID: 0}
+            vector2Value: {x: 0, y: 0}
+            vector3Value: {x: 0, y: 0, z: 0}
+            vector4Value: {x: 0, y: 0, z: 0, w: 0}
+            colorValue: {r: 1, g: 1, b: 1, a: 1}
+            enumName: 
+        lastError: 
+--- !u!4 &399593426
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 399593423}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1103480908
 GameObject:
   m_ObjectHideFlags: 0
@@ -221,6 +456,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1103480910}
   - component: {fileID: 1103480909}
+  - component: {fileID: 1103480911}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -308,9 +544,39 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &1103480911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1103480908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 332992743}
   - {fileID: 1103480910}
+  - {fileID: 399593426}

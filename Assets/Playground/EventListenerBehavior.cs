@@ -3,17 +3,22 @@ using InspectorEvents.Core;
 using UnityEngine;
 
 namespace InspectorEvents {
-   public struct ExampleEvent : ISerializedEvent {
+
+   public class ExampleEventClass : ISerializedEvent {
       public string message;
    }
-   
-   public readonly struct TestEvent : ISerializedEvent {
-      readonly int value;
-      readonly float otherValue;
+   [Serializable]
+   public struct TestEvent : ISerializedEvent {
+      public int publicValue;
+      [SerializeField] float serializedValue;
 
-      public TestEvent(int value, float otherValue) {
-         this.value = value;
-         this.otherValue = otherValue;
+      public TestEvent(int publicValue, float otherValue) {
+         this.publicValue = publicValue;
+         this.serializedValue = otherValue;
+      }
+      
+      public override string ToString() {
+         return $"TestEvent: publicValue={publicValue}, serializedValue={serializedValue}";
       }
    }
    
@@ -31,6 +36,28 @@ namespace InspectorEvents {
 
       public override string ToString() {
          return $"TestEvent2: value={value}, otherValue={otherValue}, myVector={myVector}";
+      }
+   }
+   
+   public readonly struct TestEvent3 : ISerializedEvent {
+      readonly int value;
+      readonly TestEvent testEvent;
+      readonly ExampleEventClass classValue;
+
+      public TestEvent3(int value, TestEvent testEvent, ExampleEventClass classValue) {
+         this.value = value;
+         this.testEvent = testEvent;
+         this.classValue = classValue;
+      }
+
+      // public TestEvent3(int value, ExampleEventClass classValue) {
+      //    this.value = value;
+      //    this.testEvent = default;
+      //    this.classValue = classValue;
+      // }
+      
+      public override string ToString() {
+         return $"TestEvent3: value={value}, testEvent={testEvent}, classValue={classValue?.message ?? "null"}";
       }
    }
    
