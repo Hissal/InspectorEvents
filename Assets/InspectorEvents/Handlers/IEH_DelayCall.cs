@@ -12,7 +12,7 @@ public sealed class IEH_DelayCall : IInspectorEventHandler {
     [SerializeField, ShowIf(nameof(randomize))] Vector2 delaySecondsRange;
     [PropertySpace]
     [SerializeReference] 
-    IInspectorEventHandler[] handlers = Array.Empty<IInspectorEventHandler>();
+    IInspectorEventHandler[] handlers = new IInspectorEventHandler[0];
     
     public void Handle() {
         var delay = randomize ? UnityEngine.Random.Range(delaySecondsRange.x, delaySecondsRange.y) : delaySeconds;
@@ -39,7 +39,7 @@ public sealed class IEH_DelayCall<TEvent> : IInspectorEventHandler<TEvent> {
     [SerializeField, ShowIf(nameof(randomize))] Vector2 delaySecondsRange;
     [PropertySpace]
     [SerializeReference] 
-    IInspectorEventHandler<TEvent>[] handlers = Array.Empty<IInspectorEventHandler<TEvent>>();
+    IInspectorEventHandler<TEvent>[] handlers = new IInspectorEventHandler<TEvent>[0];
     
     public void Handle(in TEvent evt) {
         var delay = randomize ? UnityEngine.Random.Range(delaySecondsRange.x, delaySecondsRange.y) : delaySeconds;

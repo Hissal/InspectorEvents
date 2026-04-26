@@ -7,9 +7,9 @@ namespace InspectorEvents.Handlers;
 [Serializable]
 public sealed class IEH_FilterCall : IInspectorEventHandler {
     [SerializeReference] 
-    IInspectorEventFilter[] filters = Array.Empty<IInspectorEventFilter>();
+    IInspectorEventFilter[] filters = new IInspectorEventFilter[0];
     [SerializeReference] 
-    IInspectorEventHandler[] handlers = Array.Empty<IInspectorEventHandler>();
+    IInspectorEventHandler[] handlers = new IInspectorEventHandler[0];
     
     public void Handle() {
         // ReSharper disable once LoopCanBeConvertedToQuery
@@ -28,9 +28,9 @@ public sealed class IEH_FilterCall : IInspectorEventHandler {
 [Serializable]
 public sealed class IEH_FilterCall<TEvent> : IInspectorEventHandler<TEvent> {
     [SerializeReference] 
-    IInspectorEventFilter<TEvent>[] filters = Array.Empty<IInspectorEventFilter<TEvent>>();
+    IInspectorEventFilter<TEvent>[] filters = new IInspectorEventFilter<TEvent>[0];
     [SerializeReference] 
-    IInspectorEventHandler<TEvent>[] handlers = Array.Empty<IInspectorEventHandler<TEvent>>();
+    IInspectorEventHandler<TEvent>[] handlers = new IInspectorEventHandler<TEvent>[0];
     
     public void Handle(in TEvent evt) {
         // ReSharper disable once LoopCanBeConvertedToQuery

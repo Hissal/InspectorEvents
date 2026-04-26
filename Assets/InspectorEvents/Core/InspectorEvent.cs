@@ -8,11 +8,11 @@ namespace InspectorEvents.Core;
 [Serializable]
 public sealed class InspectorEvent {
     [SerializeReference] 
-    IInspectorEventFilter[] filters = Array.Empty<IInspectorEventFilter>();
+    IInspectorEventFilter[] filters = new IInspectorEventFilter[0];
     
     [PropertySpace]
     [SerializeReference] 
-    IInspectorEventHandler[] handlers = Array.Empty<IInspectorEventHandler>();
+    IInspectorEventHandler[] handlers = new IInspectorEventHandler[0];
 
     public void Invoke() {
         if (!EvaluateFilters()) 
@@ -37,11 +37,11 @@ public sealed class InspectorEvent {
 [Serializable]
 public sealed class InspectorEvent<TEvent> {
     [SerializeReference] 
-    IInspectorEventFilter<TEvent>[] filters = Array.Empty<IInspectorEventFilter<TEvent>>();
+    IInspectorEventFilter<TEvent>[] filters = new IInspectorEventFilter<TEvent>[0];
     
     [PropertySpace]
     [SerializeReference] 
-    IInspectorEventHandler<TEvent>[] handlers = Array.Empty<IInspectorEventHandler<TEvent>>();
+    IInspectorEventHandler<TEvent>[] handlers = new IInspectorEventHandler<TEvent>[0];
 
 #if UNITY_EDITOR
     [SerializeReference, HideInInspector]
