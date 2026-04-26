@@ -103,7 +103,7 @@ namespace InspectorEvents.Core {
                 case false when message == subscribeOn:
                     Subscribe();
                     break;
-                case true when message == unsubscribeOn:
+                case true when message == unsubscribeOn || message == LifecycleMessage.Destroy:
                     try {
                         Unsubscribe();
                         _isSubscribed = false;
