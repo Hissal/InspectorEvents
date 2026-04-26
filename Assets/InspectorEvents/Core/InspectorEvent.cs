@@ -36,12 +36,14 @@ public sealed class InspectorEvent {
 
 [Serializable]
 public sealed class InspectorEvent<TEvent> {
+    // ReSharper disable UseArrayEmptyMethod
     [SerializeReference] 
     IInspectorEventFilter<TEvent>[] filters = new IInspectorEventFilter<TEvent>[0];
     
     [PropertySpace]
     [SerializeReference] 
     IInspectorEventHandler<TEvent>[] handlers = new IInspectorEventHandler<TEvent>[0];
+    // ReSharper restore UseArrayEmptyMethod
 
 #if UNITY_EDITOR
     [SerializeReference, HideInInspector]

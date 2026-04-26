@@ -12,6 +12,7 @@ public sealed class IEH_DelayCall : IInspectorEventHandler {
     [SerializeField, ShowIf(nameof(randomize))] Vector2 delaySecondsRange;
     [PropertySpace]
     [SerializeReference] 
+    // ReSharper disable once UseArrayEmptyMethod
     IInspectorEventHandler[] handlers = new IInspectorEventHandler[0];
     
     public void Handle() {
@@ -39,6 +40,7 @@ public sealed class IEH_DelayCall<TEvent> : IInspectorEventHandler<TEvent> {
     [SerializeField, ShowIf(nameof(randomize))] Vector2 delaySecondsRange;
     [PropertySpace]
     [SerializeReference] 
+    // ReSharper disable once UseArrayEmptyMethod
     IInspectorEventHandler<TEvent>[] handlers = new IInspectorEventHandler<TEvent>[0];
     
     public void Handle(in TEvent evt) {
