@@ -1,0 +1,25 @@
+{
+  "name": "InspectorEvents.Physics2D.Editor.Tests",
+  "references": [
+    "InspectorEvents",
+    "InspectorEvents.Physics2D"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS",
+    "INSPECTOR_EVENTS_HAS_PHYSICS2D"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.unity.modules.physics2d",
+      "expression": "1.0.0",
+      "define": "INSPECTOR_EVENTS_HAS_PHYSICS2D"
+    }
+  ]
+}
