@@ -13,6 +13,7 @@ To pin a specific release, add the tag after the URL:
 ## Releasing
 1. Update `Assets/InspectorEvents/package.json` to the version you want to publish.
 2. Run the `Release` GitHub Actions workflow manually.
-3. Enter the same plain semver version, for example `2.3.1`.
+3. Enter the plain semver version, for example `2.3.1`.
+4. Leave `auto_fix_package_version` enabled if you want the workflow to update `Assets/InspectorEvents/package.json` on `main` automatically when it does not match.
 
-The workflow aborts if the input does not match `Assets/InspectorEvents/package.json`, if the version is not plain `X.Y.Z` semver, or if the tag already exists.
+The workflow aborts if the version is not plain `X.Y.Z` semver or if the tag already exists. If `auto_fix_package_version` is disabled, it also aborts when the input does not match `Assets/InspectorEvents/package.json`.

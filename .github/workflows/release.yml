@@ -7,6 +7,11 @@ on:
         description: Package version to release (for example 2.3.1)
         required: true
         type: string
+      auto_fix_package_version:
+        description: Update Assets/InspectorEvents/package.json on main if it does not match
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: write
@@ -20,6 +25,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
 
       - name: Validate version input
         env:
@@ -30,18 +36,46 @@ jobs:
             exit 1
           fi
 
-      - name: Validate package.json version
+      - name: Read package.json version
         env:
           VERSION: ${{ github.event.inputs.version }}
         run: |
           PACKAGE_VERSION="$(jq -r '.version' Assets/InspectorEvents/package.json)"
+          echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> "$GITHUB_ENV"
+
+      - name: Validate package.json version
+        if: env.PACKAGE_VERSION == github.event.inputs.version || github.event.inputs.auto_fix_package_version != 'true'
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          PACKAGE_VERSION="${{ env.PACKAGE_VERSION }}"
 
           if [[ "$PACKAGE_VERSION" != "$VERSION" ]]; then
             echo "package.json version mismatch"
             echo "Expected: $VERSION"
             echo "Found: $PACKAGE_VERSION"
+            echo "Re-run with auto_fix_package_version enabled to update the file automatically."
             exit 1
           fi
+
+      - name: Auto-fix package.json version
+        if: env.PACKAGE_VERSION != github.event.inputs.version && github.event.inputs.auto_fix_package_version == 'true'
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          jq --arg version "$VERSION" '.version = $version' Assets/InspectorEvents/package.json > Assets/InspectorEvents/package.json.tmp
+          mv Assets/InspectorEvents/package.json.tmp Assets/InspectorEvents/package.json
+
+      - name: Commit auto-fixed package.json
+        if: env.PACKAGE_VERSION != github.event.inputs.version && github.event.inputs.auto_fix_package_version == 'true'
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Assets/InspectorEvents/package.json
+          git commit -m "Bump package version to $VERSION"
+          git push origin HEAD:main
 
       - name: Verify tag does not exist
         env:
