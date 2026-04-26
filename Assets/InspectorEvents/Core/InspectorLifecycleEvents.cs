@@ -14,7 +14,7 @@ namespace InspectorEvents.Core {
         All = Awake | Start | OnEnable | OnDisable | OnDestroy
     }
 
-    public sealed class InspectorGameObjectLifecycleEvents : MonoBehaviour {
+    public sealed class InspectorLifecycleEvents : MonoBehaviour {
         [SerializeField] InspectorGameObjectLifecycleCallbacks callbacks = InspectorGameObjectLifecycleCallbacks.None;
 
         [SerializeField, ShowIf(nameof(UsesAwake))]
