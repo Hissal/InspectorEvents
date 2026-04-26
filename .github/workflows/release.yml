@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Package version to release (for example 2.3.1)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate version input
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version must be plain semver like 2.3.1"
+            exit 1
+          fi
+
+      - name: Validate package.json version
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          PACKAGE_VERSION="$(jq -r '.version' Assets/InspectorEvents/package.json)"
+
+          if [[ "$PACKAGE_VERSION" != "$VERSION" ]]; then
+            echo "package.json version mismatch"
+            echo "Expected: $VERSION"
+            echo "Found: $PACKAGE_VERSION"
+            exit 1
+          fi
+
+      - name: Verify tag does not exist
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "Tag $VERSION already exists"
+            exit 1
+          fi
+
+      - name: Create and push tag
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "$VERSION"
+          git push origin "$VERSION"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ github.event.inputs.version }}
+        run: gh release create "$VERSION" --generate-notes --title "$VERSION"
