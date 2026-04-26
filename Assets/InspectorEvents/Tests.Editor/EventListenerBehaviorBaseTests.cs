@@ -36,8 +36,14 @@ namespace InspectorEvents.Tests.Editor {
         }
 
         static FieldInfo GetFieldInfo(Type type, string fieldName) {
-            return type.GetField(fieldName, c_instanceFieldFlags)
-                   ?? throw new InvalidOperationException($"Field '{fieldName}' was not found on '{type.Name}'.");
+            for (var currentType = type; currentType != null; currentType = currentType.BaseType) {
+                var field = currentType.GetField(fieldName, c_instanceFieldFlags);
+                if (field != null) {
+                    return field;
+                }
+            }
+
+            throw new InvalidOperationException($"Field '{fieldName}' was not found on '{type.Name}'.");
         }
 
         sealed class TestEventListener : EventListenerBehaviorBase<object> {
