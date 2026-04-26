@@ -1,6 +1,6 @@
 ﻿{
   "name": "com.hissal.inspectorevents",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "displayName": "Inspector Events",
   "description": "Enhanced serialization options for events in the Unity Inspector.",
   "unity": "6000.0",
