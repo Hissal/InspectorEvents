@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using InspectorEvents.Core;
 using NUnit.Framework;
@@ -23,125 +24,117 @@ namespace InspectorEvents.Tests.Editor {
         }
 
         [Test]
-        public void InvokeNoPayload_InvokesMatchingListenerOnce() {
-            var listener = CreateListener(
-                CreateNoPayloadEntry(GameObjectEventMessage.OnEnable, new CaptureHandler())
-            );
+        public void EventCallbacks_UseValidFlags() {
+            var values = Enum.GetValues(typeof(GameObjectEventCallbacks))
+                .Cast<GameObjectEventCallbacks>()
+                .ToArray();
 
-            listener.InvokeNoPayload(GameObjectEventMessage.OnEnable);
+            Assert.That(GameObjectEventCallbacks.None, Is.EqualTo((GameObjectEventCallbacks)0));
 
-            var capture = GetNoPayloadCapture(listener, 0);
+            var singleBitValues = values
+                .Where(value => value is not GameObjectEventCallbacks.None and not GameObjectEventCallbacks.All)
+                .ToArray();
+
+            foreach (var callback in singleBitValues) {
+                var intValue = (int)callback;
+                Assert.That(intValue > 0 && (intValue & (intValue - 1)) == 0, Is.True, $"{callback} must be a single bit.");
+            }
+
+            var allFromSingles = singleBitValues.Aggregate(GameObjectEventCallbacks.None, (current, value) => current | value);
+            Assert.That(GameObjectEventCallbacks.All, Is.EqualTo(allFromSingles));
+        }
+
+        [Test]
+        public void InvokeNoPayload_InvokesEnabledCallbackEvent() {
+            var capture = new CaptureHandler();
+            var listener = CreateListener(GameObjectEventCallbacks.OnEnable);
+            SetInspectorEventHandlers(GetField<InspectorEvent>(listener, "onEnable"), capture);
+
+            listener.InvokeNoPayload(GameObjectEventCallbacks.OnEnable);
+
             Assert.That(capture.Calls, Is.EqualTo(new[] { "OnEnable" }));
         }
 
         [Test]
-        public void InvokeNoPayload_DoesNotInvokeNonMatchingListener() {
-            var listener = CreateListener(
-                CreateNoPayloadEntry(GameObjectEventMessage.OnDisable, new CaptureHandler())
-            );
+        public void InvokeNoPayload_DoesNotInvokeDisabledCallbackEvent() {
+            var capture = new CaptureHandler();
+            var listener = CreateListener(GameObjectEventCallbacks.None);
+            SetInspectorEventHandlers(GetField<InspectorEvent>(listener, "onEnable"), capture);
 
-            listener.InvokeNoPayload(GameObjectEventMessage.OnEnable);
+            listener.InvokeNoPayload(GameObjectEventCallbacks.OnEnable);
 
-            var capture = GetNoPayloadCapture(listener, 0);
             Assert.That(capture.Calls, Is.Empty);
         }
 
         [Test]
-        public void InvokeNoPayload_AllowsDuplicateMessages_InSerializedOrder() {
+        public void InvokeNoPayload_RunsMultipleHandlersInOneInspectorEvent_InOrder() {
             var calls = new List<string>();
-            var listener = CreateListener(
-                CreateNoPayloadEntry(GameObjectEventMessage.Start, new CaptureHandler(calls, "First")),
-                CreateNoPayloadEntry(GameObjectEventMessage.OnDisable, new CaptureHandler(calls, "Wrong")),
-                CreateNoPayloadEntry(GameObjectEventMessage.Start, new CaptureHandler(calls, "Second"))
+            var listener = CreateListener(GameObjectEventCallbacks.OnEnable);
+            SetInspectorEventHandlers(
+                GetField<InspectorEvent>(listener, "onEnable"),
+                new CaptureHandler(calls, "First"),
+                new CaptureHandler(calls, "Second")
             );
 
-            listener.InvokeNoPayload(GameObjectEventMessage.Start);
+            listener.InvokeNoPayload(GameObjectEventCallbacks.OnEnable);
 
             Assert.That(calls, Is.EqualTo(new[] { "First", "Second" }));
         }
 
         [Test]
-        public void InvokeCollision3D_RoutesToTypedCollisionEvent() {
+        public void InvokeCollision3D_RoutesToEnabledTypedCollisionEvent() {
             var capture = new CaptureHandler<Collision>();
-            var listener = CreateListener(
-                CreateTypedEntry(GameObjectEventMessage.OnCollisionEnter, "collision3DEvent", capture)
-            );
+            var listener = CreateListener(GameObjectEventCallbacks.OnCollisionEnter);
+            SetInspectorEventHandlers(GetField<InspectorEvent<Collision>>(listener, "onCollisionEnter"), capture);
 
-            listener.InvokeCollision3D(GameObjectEventMessage.OnCollisionEnter, null!);
+            listener.InvokeCollision3D(GameObjectEventCallbacks.OnCollisionEnter, null!);
 
             Assert.That(capture.InvocationCount, Is.EqualTo(1));
             Assert.That(capture.LastValue, Is.Null);
         }
 
         [Test]
-        public void InvokeTrigger3D_RoutesToTypedColliderEvent() {
+        public void InvokeTrigger3D_RoutesToEnabledTypedColliderEvent() {
             var capture = new CaptureHandler<Collider>();
-            var listener = CreateListener(
-                CreateTypedEntry(GameObjectEventMessage.OnTriggerEnter, "trigger3DEvent", capture)
-            );
+            var listener = CreateListener(GameObjectEventCallbacks.OnTriggerEnter);
+            SetInspectorEventHandlers(GetField<InspectorEvent<Collider>>(listener, "onTriggerEnter"), capture);
 
-            listener.InvokeTrigger3D(GameObjectEventMessage.OnTriggerEnter, null!);
+            listener.InvokeTrigger3D(GameObjectEventCallbacks.OnTriggerEnter, null!);
 
             Assert.That(capture.InvocationCount, Is.EqualTo(1));
             Assert.That(capture.LastValue, Is.Null);
         }
 
         [Test]
-        public void InvokeCollision2D_RoutesToTypedCollision2DEvent() {
+        public void InvokeCollision2D_RoutesToEnabledTypedCollision2DEvent() {
             var capture = new CaptureHandler<Collision2D>();
-            var listener = CreateListener(
-                CreateTypedEntry(GameObjectEventMessage.OnCollisionEnter2D, "collision2DEvent", capture)
-            );
+            var listener = CreateListener(GameObjectEventCallbacks.OnCollisionEnter2D);
+            SetInspectorEventHandlers(GetField<InspectorEvent<Collision2D>>(listener, "onCollisionEnter2D"), capture);
 
-            listener.InvokeCollision2D(GameObjectEventMessage.OnCollisionEnter2D, null!);
+            listener.InvokeCollision2D(GameObjectEventCallbacks.OnCollisionEnter2D, null!);
 
             Assert.That(capture.InvocationCount, Is.EqualTo(1));
             Assert.That(capture.LastValue, Is.Null);
         }
 
         [Test]
-        public void InvokeTrigger2D_RoutesToTypedCollider2DEvent() {
+        public void InvokeTrigger2D_RoutesToEnabledTypedCollider2DEvent() {
             var capture = new CaptureHandler<Collider2D>();
-            var listener = CreateListener(
-                CreateTypedEntry(GameObjectEventMessage.OnTriggerEnter2D, "trigger2DEvent", capture)
-            );
+            var listener = CreateListener(GameObjectEventCallbacks.OnTriggerEnter2D);
+            SetInspectorEventHandlers(GetField<InspectorEvent<Collider2D>>(listener, "onTriggerEnter2D"), capture);
 
-            listener.InvokeTrigger2D(GameObjectEventMessage.OnTriggerEnter2D, null!);
+            listener.InvokeTrigger2D(GameObjectEventCallbacks.OnTriggerEnter2D, null!);
 
             Assert.That(capture.InvocationCount, Is.EqualTo(1));
             Assert.That(capture.LastValue, Is.Null);
         }
 
-        GameObjectEventListener CreateListener(params GameObjectEventListenerEntry[] entries) {
+        GameObjectEventListener CreateListener(GameObjectEventCallbacks callbacks) {
             var gameObject = new GameObject(nameof(GameObjectEventListenerTests));
             _createdObjects.Add(gameObject);
             var listener = gameObject.AddComponent<GameObjectEventListener>();
-            SetField(listener, "listeners", new List<GameObjectEventListenerEntry>(entries));
+            SetField(listener, "callbacks", callbacks);
             return listener;
-        }
-
-        static GameObjectEventListenerEntry CreateNoPayloadEntry(GameObjectEventMessage message, CaptureHandler handler) {
-            var entry = new GameObjectEventListenerEntry();
-            SetField(entry, "message", message);
-            SetInspectorEventHandlers(GetField<InspectorEvent>(entry, "noPayloadEvent"), handler);
-            return entry;
-        }
-
-        static GameObjectEventListenerEntry CreateTypedEntry<TEvent>(
-            GameObjectEventMessage message,
-            string eventFieldName,
-            CaptureHandler<TEvent> handler
-        ) {
-            var entry = new GameObjectEventListenerEntry();
-            SetField(entry, "message", message);
-            SetInspectorEventHandlers(GetField<InspectorEvent<TEvent>>(entry, eventFieldName), handler);
-            return entry;
-        }
-
-        static CaptureHandler GetNoPayloadCapture(GameObjectEventListener listener, int entryIndex) {
-            var entries = GetField<List<GameObjectEventListenerEntry>>(listener, "listeners");
-            var inspectorEvent = GetField<InspectorEvent>(entries[entryIndex], "noPayloadEvent");
-            return (CaptureHandler)GetField<IInspectorEventHandler[]>(inspectorEvent, "handlers")[0];
         }
 
         static void SetInspectorEventHandlers(InspectorEvent inspectorEvent, params IInspectorEventHandler[] handlers) {
