@@ -30,27 +30,21 @@ namespace InspectorEvents.Core {
 
         bool Has(InspectorTickCallbacks callback) => (callbacks & callback) != 0;
 
-        void Update() => Invoke(InspectorTickCallbacks.Update);
-
-        void FixedUpdate() => Invoke(InspectorTickCallbacks.FixedUpdate);
-
-        void LateUpdate() => Invoke(InspectorTickCallbacks.LateUpdate);
-
-        internal void Invoke(InspectorTickCallbacks callback) {
-            if (!Has(callback)) {
-                return;
+        void Update() {
+            if (Has(InspectorTickCallbacks.Update)) {
+                onUpdate.Invoke();
             }
+        }
 
-            switch (callback) {
-                case InspectorTickCallbacks.Update:
-                    onUpdate.Invoke();
-                    break;
-                case InspectorTickCallbacks.FixedUpdate:
-                    onFixedUpdate.Invoke();
-                    break;
-                case InspectorTickCallbacks.LateUpdate:
-                    onLateUpdate.Invoke();
-                    break;
+        void FixedUpdate() {
+            if (Has(InspectorTickCallbacks.FixedUpdate)) {
+                onFixedUpdate.Invoke();
+            }
+        }
+
+        void LateUpdate() {
+            if (Has(InspectorTickCallbacks.LateUpdate)) {
+                onLateUpdate.Invoke();
             }
         }
     }

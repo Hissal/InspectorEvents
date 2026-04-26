@@ -40,37 +40,33 @@ namespace InspectorEvents.Core {
 
         bool Has(InspectorGameObjectLifecycleCallbacks callback) => (callbacks & callback) != 0;
 
-        void Awake() => Invoke(InspectorGameObjectLifecycleCallbacks.Awake);
-
-        void Start() => Invoke(InspectorGameObjectLifecycleCallbacks.Start);
-
-        void OnEnable() => Invoke(InspectorGameObjectLifecycleCallbacks.OnEnable);
-
-        void OnDisable() => Invoke(InspectorGameObjectLifecycleCallbacks.OnDisable);
-
-        void OnDestroy() => Invoke(InspectorGameObjectLifecycleCallbacks.OnDestroy);
-
-        internal void Invoke(InspectorGameObjectLifecycleCallbacks callback) {
-            if (!Has(callback)) {
-                return;
+        void Awake() {
+            if (Has(InspectorGameObjectLifecycleCallbacks.Awake)) {
+                onAwake.Invoke();
             }
+        }
 
-            switch (callback) {
-                case InspectorGameObjectLifecycleCallbacks.Awake:
-                    onAwake.Invoke();
-                    break;
-                case InspectorGameObjectLifecycleCallbacks.Start:
-                    onStart.Invoke();
-                    break;
-                case InspectorGameObjectLifecycleCallbacks.OnEnable:
-                    onEnable.Invoke();
-                    break;
-                case InspectorGameObjectLifecycleCallbacks.OnDisable:
-                    onDisable.Invoke();
-                    break;
-                case InspectorGameObjectLifecycleCallbacks.OnDestroy:
-                    onDestroy.Invoke();
-                    break;
+        void Start() {
+            if (Has(InspectorGameObjectLifecycleCallbacks.Start)) {
+                onStart.Invoke();
+            }
+        }
+
+        void OnEnable() {
+            if (Has(InspectorGameObjectLifecycleCallbacks.OnEnable)) {
+                onEnable.Invoke();
+            }
+        }
+
+        void OnDisable() {
+            if (Has(InspectorGameObjectLifecycleCallbacks.OnDisable)) {
+                onDisable.Invoke();
+            }
+        }
+
+        void OnDestroy() {
+            if (Has(InspectorGameObjectLifecycleCallbacks.OnDestroy)) {
+                onDestroy.Invoke();
             }
         }
     }

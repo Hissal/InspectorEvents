@@ -30,25 +30,19 @@ namespace InspectorEvents.Core {
 
         bool Has(InspectorApplicationCallbacks callback) => (callbacks & callback) != 0;
 
-        void OnApplicationFocus(bool hasFocus) => InvokeFocus(hasFocus);
-
-        void OnApplicationPause(bool paused) => InvokePause(paused);
-
-        void OnApplicationQuit() => InvokeQuit();
-
-        internal void InvokeFocus(bool hasFocus) {
+        void OnApplicationFocus(bool hasFocus) {
             if (Has(InspectorApplicationCallbacks.OnApplicationFocus)) {
                 onApplicationFocus.Invoke(hasFocus);
             }
         }
 
-        internal void InvokePause(bool paused) {
+        void OnApplicationPause(bool paused) {
             if (Has(InspectorApplicationCallbacks.OnApplicationPause)) {
                 onApplicationPause.Invoke(paused);
             }
         }
 
-        internal void InvokeQuit() {
+        void OnApplicationQuit() {
             if (Has(InspectorApplicationCallbacks.OnApplicationQuit)) {
                 onApplicationQuit.Invoke();
             }

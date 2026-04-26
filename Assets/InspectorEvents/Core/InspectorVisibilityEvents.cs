@@ -25,22 +25,15 @@ namespace InspectorEvents.Core {
 
         bool Has(InspectorVisibilityCallbacks callback) => (callbacks & callback) != 0;
 
-        void OnBecameVisible() => Invoke(InspectorVisibilityCallbacks.OnBecameVisible);
-
-        void OnBecameInvisible() => Invoke(InspectorVisibilityCallbacks.OnBecameInvisible);
-
-        internal void Invoke(InspectorVisibilityCallbacks callback) {
-            if (!Has(callback)) {
-                return;
+        void OnBecameVisible() {
+            if (Has(InspectorVisibilityCallbacks.OnBecameVisible)) {
+                onBecameVisible.Invoke();
             }
+        }
 
-            switch (callback) {
-                case InspectorVisibilityCallbacks.OnBecameVisible:
-                    onBecameVisible.Invoke();
-                    break;
-                case InspectorVisibilityCallbacks.OnBecameInvisible:
-                    onBecameInvisible.Invoke();
-                    break;
+        void OnBecameInvisible() {
+            if (Has(InspectorVisibilityCallbacks.OnBecameInvisible)) {
+                onBecameInvisible.Invoke();
             }
         }
     }

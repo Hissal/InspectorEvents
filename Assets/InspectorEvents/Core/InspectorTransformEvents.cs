@@ -25,22 +25,15 @@ namespace InspectorEvents.Core {
 
         bool Has(InspectorTransformCallbacks callback) => (callbacks & callback) != 0;
 
-        void OnTransformChildrenChanged() => Invoke(InspectorTransformCallbacks.OnTransformChildrenChanged);
-
-        void OnTransformParentChanged() => Invoke(InspectorTransformCallbacks.OnTransformParentChanged);
-
-        internal void Invoke(InspectorTransformCallbacks callback) {
-            if (!Has(callback)) {
-                return;
+        void OnTransformChildrenChanged() {
+            if (Has(InspectorTransformCallbacks.OnTransformChildrenChanged)) {
+                onTransformChildrenChanged.Invoke();
             }
+        }
 
-            switch (callback) {
-                case InspectorTransformCallbacks.OnTransformChildrenChanged:
-                    onTransformChildrenChanged.Invoke();
-                    break;
-                case InspectorTransformCallbacks.OnTransformParentChanged:
-                    onTransformParentChanged.Invoke();
-                    break;
+        void OnTransformParentChanged() {
+            if (Has(InspectorTransformCallbacks.OnTransformParentChanged)) {
+                onTransformParentChanged.Invoke();
             }
         }
     }

@@ -50,47 +50,45 @@ namespace InspectorEvents.Core {
 
         bool Has(InspectorObjectMouseCallbacks callback) => (callbacks & callback) != 0;
 
-        void OnMouseEnter() => Invoke(InspectorObjectMouseCallbacks.OnMouseEnter);
-
-        void OnMouseExit() => Invoke(InspectorObjectMouseCallbacks.OnMouseExit);
-
-        void OnMouseDown() => Invoke(InspectorObjectMouseCallbacks.OnMouseDown);
-
-        void OnMouseUp() => Invoke(InspectorObjectMouseCallbacks.OnMouseUp);
-
-        void OnMouseUpAsButton() => Invoke(InspectorObjectMouseCallbacks.OnMouseUpAsButton);
-
-        void OnMouseDrag() => Invoke(InspectorObjectMouseCallbacks.OnMouseDrag);
-
-        void OnMouseOver() => Invoke(InspectorObjectMouseCallbacks.OnMouseOver);
-
-        internal void Invoke(InspectorObjectMouseCallbacks callback) {
-            if (!Has(callback)) {
-                return;
+        void OnMouseEnter() {
+            if (Has(InspectorObjectMouseCallbacks.OnMouseEnter)) {
+                onMouseEnter.Invoke();
             }
+        }
 
-            switch (callback) {
-                case InspectorObjectMouseCallbacks.OnMouseEnter:
-                    onMouseEnter.Invoke();
-                    break;
-                case InspectorObjectMouseCallbacks.OnMouseExit:
-                    onMouseExit.Invoke();
-                    break;
-                case InspectorObjectMouseCallbacks.OnMouseDown:
-                    onMouseDown.Invoke();
-                    break;
-                case InspectorObjectMouseCallbacks.OnMouseUp:
-                    onMouseUp.Invoke();
-                    break;
-                case InspectorObjectMouseCallbacks.OnMouseUpAsButton:
-                    onMouseUpAsButton.Invoke();
-                    break;
-                case InspectorObjectMouseCallbacks.OnMouseDrag:
-                    onMouseDrag.Invoke();
-                    break;
-                case InspectorObjectMouseCallbacks.OnMouseOver:
-                    onMouseOver.Invoke();
-                    break;
+        void OnMouseExit() {
+            if (Has(InspectorObjectMouseCallbacks.OnMouseExit)) {
+                onMouseExit.Invoke();
+            }
+        }
+
+        void OnMouseDown() {
+            if (Has(InspectorObjectMouseCallbacks.OnMouseDown)) {
+                onMouseDown.Invoke();
+            }
+        }
+
+        void OnMouseUp() {
+            if (Has(InspectorObjectMouseCallbacks.OnMouseUp)) {
+                onMouseUp.Invoke();
+            }
+        }
+
+        void OnMouseUpAsButton() {
+            if (Has(InspectorObjectMouseCallbacks.OnMouseUpAsButton)) {
+                onMouseUpAsButton.Invoke();
+            }
+        }
+
+        void OnMouseDrag() {
+            if (Has(InspectorObjectMouseCallbacks.OnMouseDrag)) {
+                onMouseDrag.Invoke();
+            }
+        }
+
+        void OnMouseOver() {
+            if (Has(InspectorObjectMouseCallbacks.OnMouseOver)) {
+                onMouseOver.Invoke();
             }
         }
     }

@@ -57,57 +57,43 @@ namespace InspectorEvents.Physics2D {
 
         bool Has(InspectorPhysics2DCallbacks callback) => (callbacks & callback) != 0;
 
-        void OnCollisionEnter2D(Collision2D collision) => InvokeCollision(InspectorPhysics2DCallbacks.OnCollisionEnter2D, collision);
-
-        void OnCollisionStay2D(Collision2D collision) => InvokeCollision(InspectorPhysics2DCallbacks.OnCollisionStay2D, collision);
-
-        void OnCollisionExit2D(Collision2D collision) => InvokeCollision(InspectorPhysics2DCallbacks.OnCollisionExit2D, collision);
-
-        void OnTriggerEnter2D(Collider2D other) => InvokeTrigger(InspectorPhysics2DCallbacks.OnTriggerEnter2D, other);
-
-        void OnTriggerStay2D(Collider2D other) => InvokeTrigger(InspectorPhysics2DCallbacks.OnTriggerStay2D, other);
-
-        void OnTriggerExit2D(Collider2D other) => InvokeTrigger(InspectorPhysics2DCallbacks.OnTriggerExit2D, other);
-
-        void OnJointBreak2D(Joint2D brokenJoint) => InvokeJointBreak(brokenJoint);
-
-        internal void InvokeCollision(InspectorPhysics2DCallbacks callback, Collision2D collision) {
-            if (!Has(callback)) {
-                return;
-            }
-
-            switch (callback) {
-                case InspectorPhysics2DCallbacks.OnCollisionEnter2D:
-                    onCollisionEnter2D.Invoke(collision);
-                    break;
-                case InspectorPhysics2DCallbacks.OnCollisionStay2D:
-                    onCollisionStay2D.Invoke(collision);
-                    break;
-                case InspectorPhysics2DCallbacks.OnCollisionExit2D:
-                    onCollisionExit2D.Invoke(collision);
-                    break;
+        void OnCollisionEnter2D(Collision2D collision) {
+            if (Has(InspectorPhysics2DCallbacks.OnCollisionEnter2D)) {
+                onCollisionEnter2D.Invoke(collision);
             }
         }
 
-        internal void InvokeTrigger(InspectorPhysics2DCallbacks callback, Collider2D other) {
-            if (!Has(callback)) {
-                return;
-            }
-
-            switch (callback) {
-                case InspectorPhysics2DCallbacks.OnTriggerEnter2D:
-                    onTriggerEnter2D.Invoke(other);
-                    break;
-                case InspectorPhysics2DCallbacks.OnTriggerStay2D:
-                    onTriggerStay2D.Invoke(other);
-                    break;
-                case InspectorPhysics2DCallbacks.OnTriggerExit2D:
-                    onTriggerExit2D.Invoke(other);
-                    break;
+        void OnCollisionStay2D(Collision2D collision) {
+            if (Has(InspectorPhysics2DCallbacks.OnCollisionStay2D)) {
+                onCollisionStay2D.Invoke(collision);
             }
         }
 
-        internal void InvokeJointBreak(Joint2D brokenJoint) {
+        void OnCollisionExit2D(Collision2D collision) {
+            if (Has(InspectorPhysics2DCallbacks.OnCollisionExit2D)) {
+                onCollisionExit2D.Invoke(collision);
+            }
+        }
+
+        void OnTriggerEnter2D(Collider2D other) {
+            if (Has(InspectorPhysics2DCallbacks.OnTriggerEnter2D)) {
+                onTriggerEnter2D.Invoke(other);
+            }
+        }
+
+        void OnTriggerStay2D(Collider2D other) {
+            if (Has(InspectorPhysics2DCallbacks.OnTriggerStay2D)) {
+                onTriggerStay2D.Invoke(other);
+            }
+        }
+
+        void OnTriggerExit2D(Collider2D other) {
+            if (Has(InspectorPhysics2DCallbacks.OnTriggerExit2D)) {
+                onTriggerExit2D.Invoke(other);
+            }
+        }
+
+        void OnJointBreak2D(Joint2D brokenJoint) {
             if (Has(InspectorPhysics2DCallbacks.OnJointBreak2D)) {
                 onJointBreak2D.Invoke(brokenJoint);
             }

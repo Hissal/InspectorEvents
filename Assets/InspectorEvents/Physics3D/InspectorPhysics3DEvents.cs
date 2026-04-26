@@ -63,65 +63,49 @@ namespace InspectorEvents.Physics3D {
 
         bool Has(InspectorPhysics3DCallbacks callback) => (callbacks & callback) != 0;
 
-        void OnCollisionEnter(Collision collision) => InvokeCollision(InspectorPhysics3DCallbacks.OnCollisionEnter, collision);
-
-        void OnCollisionStay(Collision collision) => InvokeCollision(InspectorPhysics3DCallbacks.OnCollisionStay, collision);
-
-        void OnCollisionExit(Collision collision) => InvokeCollision(InspectorPhysics3DCallbacks.OnCollisionExit, collision);
-
-        void OnTriggerEnter(Collider other) => InvokeTrigger(InspectorPhysics3DCallbacks.OnTriggerEnter, other);
-
-        void OnTriggerStay(Collider other) => InvokeTrigger(InspectorPhysics3DCallbacks.OnTriggerStay, other);
-
-        void OnTriggerExit(Collider other) => InvokeTrigger(InspectorPhysics3DCallbacks.OnTriggerExit, other);
-
-        void OnControllerColliderHit(ControllerColliderHit hit) => InvokeControllerColliderHit(hit);
-
-        void OnJointBreak(float breakForce) => InvokeJointBreak(breakForce);
-
-        internal void InvokeCollision(InspectorPhysics3DCallbacks callback, Collision collision) {
-            if (!Has(callback)) {
-                return;
-            }
-
-            switch (callback) {
-                case InspectorPhysics3DCallbacks.OnCollisionEnter:
-                    onCollisionEnter.Invoke(collision);
-                    break;
-                case InspectorPhysics3DCallbacks.OnCollisionStay:
-                    onCollisionStay.Invoke(collision);
-                    break;
-                case InspectorPhysics3DCallbacks.OnCollisionExit:
-                    onCollisionExit.Invoke(collision);
-                    break;
+        void OnCollisionEnter(Collision collision) {
+            if (Has(InspectorPhysics3DCallbacks.OnCollisionEnter)) {
+                onCollisionEnter.Invoke(collision);
             }
         }
 
-        internal void InvokeTrigger(InspectorPhysics3DCallbacks callback, Collider other) {
-            if (!Has(callback)) {
-                return;
-            }
-
-            switch (callback) {
-                case InspectorPhysics3DCallbacks.OnTriggerEnter:
-                    onTriggerEnter.Invoke(other);
-                    break;
-                case InspectorPhysics3DCallbacks.OnTriggerStay:
-                    onTriggerStay.Invoke(other);
-                    break;
-                case InspectorPhysics3DCallbacks.OnTriggerExit:
-                    onTriggerExit.Invoke(other);
-                    break;
+        void OnCollisionStay(Collision collision) {
+            if (Has(InspectorPhysics3DCallbacks.OnCollisionStay)) {
+                onCollisionStay.Invoke(collision);
             }
         }
 
-        internal void InvokeControllerColliderHit(ControllerColliderHit hit) {
+        void OnCollisionExit(Collision collision) {
+            if (Has(InspectorPhysics3DCallbacks.OnCollisionExit)) {
+                onCollisionExit.Invoke(collision);
+            }
+        }
+
+        void OnTriggerEnter(Collider other) {
+            if (Has(InspectorPhysics3DCallbacks.OnTriggerEnter)) {
+                onTriggerEnter.Invoke(other);
+            }
+        }
+
+        void OnTriggerStay(Collider other) {
+            if (Has(InspectorPhysics3DCallbacks.OnTriggerStay)) {
+                onTriggerStay.Invoke(other);
+            }
+        }
+
+        void OnTriggerExit(Collider other) {
+            if (Has(InspectorPhysics3DCallbacks.OnTriggerExit)) {
+                onTriggerExit.Invoke(other);
+            }
+        }
+
+        void OnControllerColliderHit(ControllerColliderHit hit) {
             if (Has(InspectorPhysics3DCallbacks.OnControllerColliderHit)) {
                 onControllerColliderHit.Invoke(hit);
             }
         }
 
-        internal void InvokeJointBreak(float breakForce) {
+        void OnJointBreak(float breakForce) {
             if (Has(InspectorPhysics3DCallbacks.OnJointBreak)) {
                 onJointBreak.Invoke(breakForce);
             }

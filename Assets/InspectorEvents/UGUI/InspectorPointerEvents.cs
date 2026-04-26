@@ -144,114 +144,111 @@ namespace InspectorEvents.UGUI {
 
         bool Has(InspectorPointerCallbacks callback) => (callbacks & callback) != 0;
 
-        public void OnPointerMove(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnPointerMove, eventData);
-
-        public void OnPointerEnter(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnPointerEnter, eventData);
-
-        public void OnPointerExit(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnPointerExit, eventData);
-
-        public void OnPointerDown(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnPointerDown, eventData);
-
-        public void OnPointerUp(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnPointerUp, eventData);
-
-        public void OnPointerClick(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnPointerClick, eventData);
-
-        public void OnInitializePotentialDrag(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnInitializePotentialDrag, eventData);
-
-        public void OnBeginDrag(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnBeginDrag, eventData);
-
-        public void OnDrag(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnDrag, eventData);
-
-        public void OnEndDrag(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnEndDrag, eventData);
-
-        public void OnDrop(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnDrop, eventData);
-
-        public void OnScroll(PointerEventData eventData) => InvokePointer(InspectorPointerCallbacks.OnScroll, eventData);
-
-        public void OnUpdateSelected(BaseEventData eventData) => InvokeBase(InspectorPointerCallbacks.OnUpdateSelected, eventData);
-
-        public void OnSelect(BaseEventData eventData) => InvokeBase(InspectorPointerCallbacks.OnSelect, eventData);
-
-        public void OnDeselect(BaseEventData eventData) => InvokeBase(InspectorPointerCallbacks.OnDeselect, eventData);
-
-        public void OnMove(AxisEventData eventData) => InvokeMove(eventData);
-
-        public void OnSubmit(BaseEventData eventData) => InvokeBase(InspectorPointerCallbacks.OnSubmit, eventData);
-
-        public void OnCancel(BaseEventData eventData) => InvokeBase(InspectorPointerCallbacks.OnCancel, eventData);
-
-        internal void InvokePointer(InspectorPointerCallbacks callback, PointerEventData eventData) {
-            if (!Has(callback)) {
-                return;
-            }
-
-            switch (callback) {
-                case InspectorPointerCallbacks.OnPointerMove:
-                    onPointerMove.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnPointerEnter:
-                    onPointerEnter.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnPointerExit:
-                    onPointerExit.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnPointerDown:
-                    onPointerDown.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnPointerUp:
-                    onPointerUp.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnPointerClick:
-                    onPointerClick.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnInitializePotentialDrag:
-                    onInitializePotentialDrag.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnBeginDrag:
-                    onBeginDrag.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnDrag:
-                    onDrag.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnEndDrag:
-                    onEndDrag.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnDrop:
-                    onDrop.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnScroll:
-                    onScroll.Invoke(eventData);
-                    break;
+        public void OnPointerMove(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnPointerMove)) {
+                onPointerMove.Invoke(eventData);
             }
         }
 
-        internal void InvokeBase(InspectorPointerCallbacks callback, BaseEventData eventData) {
-            if (!Has(callback)) {
-                return;
-            }
-
-            switch (callback) {
-                case InspectorPointerCallbacks.OnUpdateSelected:
-                    onUpdateSelected.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnSelect:
-                    onSelect.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnDeselect:
-                    onDeselect.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnSubmit:
-                    onSubmit.Invoke(eventData);
-                    break;
-                case InspectorPointerCallbacks.OnCancel:
-                    onCancel.Invoke(eventData);
-                    break;
+        public void OnPointerEnter(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnPointerEnter)) {
+                onPointerEnter.Invoke(eventData);
             }
         }
 
-        internal void InvokeMove(AxisEventData eventData) {
+        public void OnPointerExit(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnPointerExit)) {
+                onPointerExit.Invoke(eventData);
+            }
+        }
+
+        public void OnPointerDown(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnPointerDown)) {
+                onPointerDown.Invoke(eventData);
+            }
+        }
+
+        public void OnPointerUp(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnPointerUp)) {
+                onPointerUp.Invoke(eventData);
+            }
+        }
+
+        public void OnPointerClick(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnPointerClick)) {
+                onPointerClick.Invoke(eventData);
+            }
+        }
+
+        public void OnInitializePotentialDrag(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnInitializePotentialDrag)) {
+                onInitializePotentialDrag.Invoke(eventData);
+            }
+        }
+
+        public void OnBeginDrag(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnBeginDrag)) {
+                onBeginDrag.Invoke(eventData);
+            }
+        }
+
+        public void OnDrag(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnDrag)) {
+                onDrag.Invoke(eventData);
+            }
+        }
+
+        public void OnEndDrag(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnEndDrag)) {
+                onEndDrag.Invoke(eventData);
+            }
+        }
+
+        public void OnDrop(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnDrop)) {
+                onDrop.Invoke(eventData);
+            }
+        }
+
+        public void OnScroll(PointerEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnScroll)) {
+                onScroll.Invoke(eventData);
+            }
+        }
+
+        public void OnUpdateSelected(BaseEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnUpdateSelected)) {
+                onUpdateSelected.Invoke(eventData);
+            }
+        }
+
+        public void OnSelect(BaseEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnSelect)) {
+                onSelect.Invoke(eventData);
+            }
+        }
+
+        public void OnDeselect(BaseEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnDeselect)) {
+                onDeselect.Invoke(eventData);
+            }
+        }
+
+        public void OnMove(AxisEventData eventData) {
             if (Has(InspectorPointerCallbacks.OnMove)) {
                 onMove.Invoke(eventData);
+            }
+        }
+
+        public void OnSubmit(BaseEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnSubmit)) {
+                onSubmit.Invoke(eventData);
+            }
+        }
+
+        public void OnCancel(BaseEventData eventData) {
+            if (Has(InspectorPointerCallbacks.OnCancel)) {
+                onCancel.Invoke(eventData);
             }
         }
     }
